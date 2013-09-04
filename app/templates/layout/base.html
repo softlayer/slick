@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Slick{% if title %} - {{title}}{% endif %}</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap -->
+    <link href="/static/css/bootstrap/bootstrap.min.css" rel="stylesheet" media="screen">
+{# @TODO - Figure out where these come from
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="../../assets/js/html5shiv.js"></script>
+      <script src="../../assets/js/respond.min.js"></script>
+    <![endif]-->  
+#}
+    <link href="/static/css/site/slick.css" rel="stylesheet" media="screen">
+    {% block css %}{% endblock %}
+  </head>
+  <body>
+    <div class="container">
+
+    {# Menu #}
+    {% if g.user.is_authenticated() %}
+      {% include 'layout/menu.html' %}
+    {% endif %}
+
+    {# Flash messages start #}
+    <hr>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+    {# Flash messages end #}
+
+    {# Page Content #}
+    {% block content %}{% endblock %}
+
+    </div>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="//code.jquery.com/jquery.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="/static/js/bootstrap.min.js"></script>
+    {% block javascript %}{% endblock %}
+  </body>
+</html>

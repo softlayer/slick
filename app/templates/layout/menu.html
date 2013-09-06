@@ -13,7 +13,18 @@
   <div class="collapse navbar-collapse navbar-ex1-collapse">
     <ul class="nav navbar-nav">
       {% for endpoint, label, order in left_menu %}
-        <li{% if endpoint == request.endpoint %} class="active"{% endif %}><a href="{{ url_for(endpoint)}}">{{ label }}</a></li>
+        {% if not endpoint is string %}
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ label }} <b class="caret"></b></a>
+            <ul class="dropdown-menu">
+              {% for sub_endpoint, sub_label in endpoint %}
+                <li><a href="{{ url_for(sub_endpoint) }}">{{ sub_label }}</a></li>
+              {% endfor %}
+            </ul>
+          </li>
+        {% else  %}
+          <li{% if endpoint == request.endpoint %} class="active"{% endif %}><a href="{{ url_for(endpoint)}}">{{ label }}</a></li>
+        {% endif %}
       {% endfor %}
 {#
       <li{% if not section or section == 'dashboard' %} class="active"{% endif %}><a href="{{ url_for('site_module.index') }}">Dashboard</a></li>

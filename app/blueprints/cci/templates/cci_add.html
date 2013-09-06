@@ -1,0 +1,102 @@
+{% extends "layout/base.html" %}
+
+{% block content %}
+<form action="{{ url_for('cci_module.create') }}" method="post" id='cci_add_form' class="form-horizontal" role="form">
+  {{form.hidden_tag()}}
+
+  {# Hostname and Domain #}
+  <div class="form-group">
+    <label for="hostname" class="col-lg-2 control-label">Name</label>
+    <div class="col-lg-2{% if form.hostname.errors %} has-error{% endif %}">
+      {{form.hostname(class="form-control", autofocus=true, placeholder='Hostname')}}
+      {% if form.hostname.errors and form.hostname.errors is iterable %}
+      <span class="help-block">
+        <ul class="list-unstyled">
+          {% for error in form.hostname.errors %}
+          <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
+      </span>
+      {% endif %}
+    </div>
+    <div class="col-lg-2{% if form.domain.errors %} has-error{% endif %}">
+      {{form.domain(class="form-control", placeholder='Domain')}}
+      {% if form.domain.errors and form.domain.errors is iterable %}
+      <span class="help-block">
+        <ul class="list-unstyled">
+          {% for error in form.domain.errors %}
+          <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
+      </span>
+      {% endif %}
+    </div>
+  </div>
+
+  {# Data Center #}
+  {{ helpers.field_enclosure(form.datacenter(class="form-control"), label='Data Center', field_name='datacenter', errors=form.datacenter.errors) }}
+
+  {# Operating System #}
+  {{ helpers.field_enclosure(form.os(class="form-control"), label='Operating System', field_name='os', errors=form.os.errors) }}
+
+  {# CPUs #}
+  {{ helpers.field_enclosure(form.cpus(class="form-control"), label='CPUs', field_name='cpus', errors=form.cpus.errors) }}
+
+  {# RAM #}
+  {{ helpers.field_enclosure(form.memory(class="form-control"), label='Memory', field_name='memory', errors=form.memory.errors) }}
+
+  {# NIC Speed #}
+  <div class="form-group">
+    <label for="network" class="col-lg-2 control-label">Network</label>
+    <div class="col-lg-4{% if form.network.errors %} has-error{% endif %}">
+      {% for option in form.network %}
+        <label class="radio-inline">
+          <input type="radio" class="form-control" name="{{ option.name }}" id="{{ option.id }}" value="{{ option.data }}"{% if option.checked %} checked{% endif %}> {{ option.label }}
+        </label>
+      {% endfor %}
+      {% if form.network.errors and form.network.errors is iterable %}
+      <span class="help-block">
+        <ul class="list-unstyled">
+          {% for error in form.network.errors %}
+          <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
+      </span>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-offset-2 col-lg-4" id="price_div"></div>
+  </div>
+
+  {# Submit Buttons #}
+  <div class="form-group">
+    <div class="col-lg-offset-2 col-lg-10">
+      <button type="submit" class="btn btn-primary">Launch Instance</button>
+      <button type="submit" class="btn btn-success" id="price_submit">Get Price Quote</button>
+      <a href="{{ url_for('cci_module.index') }}" class="btn btn-default">Cancel</a>
+    </div>
+  </div>
+</form>
+{% endblock %}
+
+{% block javascript %}
+<script type="text/javascript">
+$('#price_submit').click(function(event) {
+    event.preventDefault();
+
+    valid = $('#cci_add_form').parsley('validate');
+    
+    if (valid) {
+      div = $('#price_div');
+      div.html('<img src="/static/img/ajax-loader.gif" alt="Loading Price Quote"> Getting Quote');
+      result = $.post('{{ url_for('cci_module.price_check') }}', $('#cci_add_form').serialize()).done(function(data) { div.html(data) });
+    }
+});
+
+$('.form-control').change(function() {
+    $('#price_div').html('');
+});
+</script>
+{% endblock %}

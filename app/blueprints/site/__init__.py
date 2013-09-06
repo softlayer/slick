@@ -1,4 +1,4 @@
-from flask import Blueprint, url_for
+from flask import Blueprint
 
 site_module = Blueprint('site_module', __name__, template_folder='templates')
 

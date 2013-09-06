@@ -1,3 +1,4 @@
+{% import 'utils/helpers.html' as helpers %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -18,24 +19,36 @@
   </head>
   <body>
     <div class="container">
-
     {# Menu #}
     {% if g.user.is_authenticated() %}
       {% include 'layout/menu.html' %}
     {% endif %}
 
     {# Flash messages start #}
-    <hr>
-    {% with messages = get_flashed_messages() %}
-    {% if messages %}
-    <ul>
-    {% for message in messages %}
-      <li>{{ message }}</li>
-    {% endfor %}
-    </ul>
-    {% endif %}
+    {% with errors = get_flashed_messages(category_filter=['error']) %}
+      {% if errors %}
+        {% for error in errors %}
+          <div class="alert alert-danger fade in">
+            <a class="close" data-dismiss="alert" href="#" aria-hidden="true">&times;</a>
+	    {{ error }}<br/>
+  	  </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    {% with successes = get_flashed_messages(category_filter=['success']) %}
+      {% if successes %}
+        {% for success in successes %}
+          <div class="alert alert-success fade in">
+            <a class="close" data-dismiss="alert" href="#" aria-hidden="true">&times;</a>
+            {{ success }}<br/>
+  	  </div>
+        {% endfor %}
+      {% endif %}
     {% endwith %}
     {# Flash messages end #}
+
+    <h1><small>{{ title }}</small></h1>
 
     {# Page Content #}
     {% block content %}{% endblock %}
@@ -46,6 +59,24 @@
     <script src="//code.jquery.com/jquery.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/parsley.min.js"></script>
+    <script>$('form').parsley({ 
+        successClass: 'has-success', 
+        errorClass: 'has-error',
+        errors: {
+          classHandler: function (element) {
+            return $(element).parent();
+          },
+          container: function (element) {
+            var $container = element.parent().find(".help-block");
+            if ($container.length === 0) {
+              $container = $("<span class='help-block'></span>").insertAfter(element);
+            };
+            return $container;
+          },
+          errorsWrapper: '<ul class="list-unstyled"></ul>'
+        }});
+    </script>
     {% block javascript %}{% endblock %}
   </body>
 </html>

@@ -3,8 +3,8 @@
 # C extensions
 *.so
 
-# Configuration data
-twilio_config.py
+# Backup files
+*~
 
 # Packages
 *.egg

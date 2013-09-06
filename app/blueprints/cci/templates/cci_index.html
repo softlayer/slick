@@ -1,0 +1,51 @@
+{% extends "layout/base.html" %}
+{% block content %}
+{% if instances %}
+<table class="table table-striped table-bordered table-responsive">
+  <thead>
+    <tr>
+      <th>Hostname</th>
+      <th>Datacenter</th>
+      <th>Public</th>
+      <th>Private</th>
+      <th>CPU</th>
+      <th>Memory</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for instance in instances %}
+    <tr>
+      <td>{{ instance.fqdn}}</td>
+      <td>{{ instance.datacenter }}</td>
+      <td>{{ instance.public }}</td>
+      <td>{{ instance.private }}</td>
+      <td>{{ instance.cpu }}</td>
+      <td>{{ instance.memory // 1024 }} GB</td>
+      <td>
+       {% if instance.active and instance.datacenter %}
+        <div class="btn-group">
+          <button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown">
+            Action <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu">
+            <li><a href="/compute/view/{{ instance.id }}"><i class="icon-search"></i> View</a></li>
+            <li><a href="/domain/quick_register_cci/{{ instance.domain }}/{{ instance.hostname }}/{{ instance.public }}"><i class="icon-globe"></i> Register in DNS</a></li>
+            <li><a href="/compute/clone_cci/{{ instance.id }}"><i class="icon-share"></i> Order Another</a></li>
+            <li><a href="/compute/reload/{{ instance.id }}" data-confirm="This will erase the system and restore it to the base OS. Are you sure you want to continue?"><i class="icon-repeat"></i> Reload</a></li>
+            <li><a href="/compute/cancel/{{ instance.id }}"><i class="icon-trash"></i> Cancel</a></li>
+          </ul>
+        </div>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<div class="panel panel-danger">
+  <div class="panel-heading">Error</div>
+  <div class="panel-body">No CCIs found on your account.</div>
+</div>
+{% endif %}
+{% endblock %}

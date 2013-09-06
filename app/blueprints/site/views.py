@@ -2,7 +2,7 @@ from flask import g, redirect, url_for, flash, request, render_template, \
     session
 from flask.ext.login import login_user, logout_user, login_required
 
-from SoftLayer import Client, TokenAuthentication, SoftLayerAPIError
+from SoftLayer import Client, SoftLayerAPIError
 
 from app import db, lm
 from app.blueprints.site import site_module
@@ -18,10 +18,10 @@ def index():
     user = g.user
     client = get_client()
     user = client['Account'].getCurrentUser(mask='mask[permissions]')
-    for perm in user['permissions']:
-        if 'UPGRADE' in perm['keyName']:
-            print perm['keyName'],'-',perm['name']
-    return render_template("index.html", title='Home', user=user)
+#    for perm in user['permissions']:
+#        if 'UPGRADE' in perm['keyName']:
+#            print perm['keyName'],'-',perm['name']
+    return render_template("site_index.html", title='Home', user=user)
 
 
 @site_module.route('/login', methods=['GET', 'POST'])
@@ -72,8 +72,8 @@ def login():
         return redirect(request.args.get('next') or
                         url_for('site_module.index'))
     # @TODO - This always displays
-    flash("LOGIN FAILED!")
-    return render_template('login.html',
+#    flash("LOGIN FAILED!")
+    return render_template('site_login.html',
                            title='Sign In',
                            form=form)
 

@@ -26,6 +26,7 @@ app = Slick(__name__)
 app.config.from_object('config')
 app.static_folder = join(dirname(abspath(__file__)), "static")
 app.static_url_path = "/static/"
+app.jinja_env.add_extension('jinja2.ext.do')
 
 # Create the database object
 db = SQLAlchemy(app)
@@ -41,8 +42,10 @@ toolbar = DebugToolbarExtension(app)
 # Load all of our blueprints
 # TODO - I want to make this more dynamic
 from app.blueprints.site import site_module
+from app.blueprints.cci import cci_module
 
 app.register_blueprint(site_module)
+app.register_blueprint(cci_module)
 #from app import views, models
 
 
@@ -54,8 +57,6 @@ def before_request():
 @app.context_processor
 def generate_menu():
     return dict(
-        left_menu=sorted(sorted(app.left_menu, key=lambda x: x[2]),
-                         key=lambda x: x[1].lower()),
-        right_menu=sorted(sorted(app.right_menu, key=lambda x: x[2]),
-                          key=lambda x: x[1].lower()),
+        left_menu=sorted(app.left_menu, key=lambda x: (x[2], x[1])),
+        right_menu=sorted(app.right_menu, key=lambda x: (x[2], x[1]))
     )

@@ -51,7 +51,7 @@
     <div class="col-lg-4{% if form.network.errors %} has-error{% endif %}">
       {% for option in form.network %}
         <label class="radio-inline">
-          <input type="radio" class="form-control" name="{{ option.name }}" id="{{ option.id }}" value="{{ option.data }}"{% if option.checked %} checked{% endif %}> {{ option.label }}
+          <input type="radio" name="{{ option.name }}" id="{{ option.id }}" value="{{ option.data }}"{% if option.checked %} checked{% endif %}> {{ option.label }}
         </label>
       {% endfor %}
       {% if form.network.errors and form.network.errors is iterable %}
@@ -91,11 +91,15 @@ $('#price_submit').click(function(event) {
     if (valid) {
       div = $('#price_div');
       div.html('<img src="/static/img/ajax-loader.gif" alt="Loading Price Quote"> Getting Quote');
-      result = $.post('{{ url_for('cci_module.price_check') }}', $('#cci_add_form').serialize()).done(function(data) { div.html(data) });
+      $.post('{{ url_for('cci_module.price_check') }}', $('#cci_add_form').serialize()).done(function(data) { div.html(data) });
     }
 });
 
 $('.form-control').change(function() {
+    $('#price_div').html('');
+});
+
+$('input[type=radio]').change(function() {
     $('#price_div').html('');
 });
 </script>

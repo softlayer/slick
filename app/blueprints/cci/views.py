@@ -1,9 +1,11 @@
-from flask import g, redirect, url_for, flash, request, render_template
+import json
+from flask import redirect, url_for, flash, request, render_template
 from flask.ext.login import login_required
 
 from app.blueprints.cci import cci_module
 from app.blueprints.cci.forms import CreateCCIForm
 from app.blueprints.cci.manager import (all_instances, all_instance_options,
+                                        get_instance, reload_instance,
                                         launch_instance, validate_instance)
 
 
@@ -42,9 +44,28 @@ def create():
     form.memory.choices = ram_options
 
     if form.validate_on_submit():
-        print "Taco snacks"
-        for f in form:
-            print f.name,f.data
+        fields = {}
+        for field in form:
+            if 'csrf_token' == field.name:
+                continue
+
+            fields[field.name] = field.data
+
+        (success, message) = launch_instance(**fields)
+        if success:
+            flash(message, 'success')
+
+            if request.form.get('save_template'):
+                template_name = request.form.get('template_title')
+
+                fields['title'] = template_name
+                _save_template(fields)
+
+                flash('Configuration saved for future use.', 'success')
+
+            return redirect(url_for("cci_module.index"))
+        else:
+            flash(message, 'error')
 
     if form.errors:
         flash('There are validation errors with your submission.', 'error')
@@ -55,21 +76,39 @@ def create():
 @cci_module.route('/priceCheck', methods=['GET', 'POST'])
 @login_required
 def price_check():
-    fields = _extract_cci_fields(request.form)
-    results = validate_instance(**fields)
-    return render_template('cci_price_quote.html', order_template=results)
-
-
-def _extract_cci_fields(source):
     form = CreateCCIForm()
 
-    results = {}
+    fields = {}
 
     for field in form:
         if 'csrf_token' == field.name:
             continue
 
-        if source.get(field.name):
-            results[field.name] = source[field.name]
+        if request.form.get(field.name):
+            fields[field.name] = request.form[field.name]
 
-    return results
+    results = validate_instance(**fields)
+    return render_template('cci_price_quote.html', order_template=results)
+
+
+@cci_module.route('/reload/<int:cci_id>')
+@login_required
+def reload_cci(cci_id):
+    (success, message) = reload_instance(cci_id)
+    return json.dumps({'success': success, 'message': message})
+
+
+@cci_module.route('/status')
+@cci_module.route('/status/<int:cci_id>')
+@login_required
+def status(cci_id):
+    if not cci_id:
+        return None
+
+    instance = get_instance(cci_id)
+    html = render_template('cci_instance_row.html', instance=instance)
+
+    return json.dumps({
+        'active': instance['active'],
+        'row_html': html,
+    })

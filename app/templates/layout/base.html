@@ -25,6 +25,7 @@
     {% endif %}
 
     {# Flash messages start #}
+    <div id="notifications">
     {% with errors = get_flashed_messages(category_filter=['error']) %}
       {% if errors %}
         {% for error in errors %}
@@ -46,6 +47,7 @@
         {% endfor %}
       {% endif %}
     {% endwith %}
+    </div>
     {# Flash messages end #}
 
     <h1><small>{{ title }}</small></h1>
@@ -59,24 +61,9 @@
     <script src="//code.jquery.com/jquery.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/bootbox.min.js"></script>
     <script src="/static/js/parsley.min.js"></script>
-    <script>$('form').parsley({ 
-        successClass: 'has-success', 
-        errorClass: 'has-error',
-        errors: {
-          classHandler: function (element) {
-            return $(element).parent();
-          },
-          container: function (element) {
-            var $container = element.parent().find(".help-block");
-            if ($container.length === 0) {
-              $container = $("<span class='help-block'></span>").insertAfter(element);
-            };
-            return $container;
-          },
-          errorsWrapper: '<ul class="list-unstyled"></ul>'
-        }});
-    </script>
+    <script src="/static/js/core.js"></script>
     {% block javascript %}{% endblock %}
   </body>
 </html>

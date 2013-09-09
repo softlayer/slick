@@ -1,25 +1,17 @@
+from __future__ import division
 import json
+import math
+
 from flask import redirect, url_for, flash, request, render_template
 from flask.ext.login import login_required
 
+from app import app
+from app.utils.core import get_client
 from app.blueprints.cci import cci_module
 from app.blueprints.cci.forms import CreateCCIForm
 from app.blueprints.cci.manager import (all_instances, all_instance_options,
                                         get_instance, reload_instance,
                                         launch_instance, validate_instance)
-
-
-@cci_module.route('/')
-@cci_module.route('/index')
-@login_required
-def index():
-    instance_filter = {}
-
-    instances = all_instances(instance_filter)
-    payload = {}
-    payload['title'] = 'List Instances'
-    payload['instances'] = instances
-    return render_template("cci_index.html", **payload)
 
 
 @cci_module.route('/add', methods=['GET', 'POST'])
@@ -71,6 +63,30 @@ def create():
         flash('There are validation errors with your submission.', 'error')
 
     return render_template('cci_add.html', title='Create Instance', form=form)
+
+
+@cci_module.route('/', defaults={'page': 1})
+@cci_module.route('/index', defaults={'page': 1})
+@cci_module.route('/index/page/<int:page>')
+@login_required
+def index(page):
+    instance_filter = {
+        'limit': app.config['PAGE_SIZE'],
+        'offset': math.floor(app.config['PAGE_SIZE'] * (page - 1)),
+    }
+
+    account_obj = get_client()['Account']
+    total_ccis = account_obj.getCurrentUser(mask='mask[id,virtualGuestCount]')
+    total_ccis = total_ccis.get('virtualGuestCount')
+
+    instances = all_instances(instance_filter)
+    payload = {}
+    payload['title'] = 'List Instances'
+    payload['instances'] = instances
+    payload['current_page'] = page
+    payload['total_items'] = total_ccis
+
+    return render_template("cci_index.html", **payload)
 
 
 @cci_module.route('/priceCheck', methods=['GET', 'POST'])

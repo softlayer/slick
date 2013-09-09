@@ -17,3 +17,21 @@
     </div>
   </div>
 {%- endmacro %}
+
+{% macro pagination(endpoint, current_page, total_items) -%}
+  {% set highest_page = (total_items / config['PAGE_SIZE'])|round(0, 'ceil')|int %}
+  {% set current_max = config.PAGE_SIZE * current_page %}
+  {% if current_max > total_items %}
+    {% set current_max = total_items %}
+  {% endif %}
+
+  <ul class="pagination">
+    <li{% if current_page == 1 %} class="disabled"{% endif %}><a href="{{ url_for(endpoint, page=current_page-1) }}">&laquo;</a></li>
+    {% for i in range(1, highest_page+1) %}
+    <li{% if i == current_page %} class="active"{% endif %}><a href="{{ url_for(endpoint, page=i) }}">{{ i }}</a></li>
+    {% endfor %}
+    <li{% if current_page == highest_page %} class="disabled"{% endif %}><a href="{{ url_for(endpoint, page=current_page+1) }}">&raquo;</a></li>
+    {# TODO - This is weird. I should change it before release. #}
+    <li class="disabled"><a href="#">Showing {{ (current_page-1) * config.PAGE_SIZE + 1 }} - {{ current_max }} of {{ total_items }}</a></li>
+  </ul>
+{%- endmacro %}

@@ -1,4 +1,6 @@
-from os.path import dirname, abspath, join
+import importlib
+from os import listdir
+from os.path import dirname, abspath, join, isdir, exists
 
 from flask import Flask, g
 from flask.ext.login import LoginManager, current_user
@@ -40,15 +42,8 @@ lm.login_view = 'site_module.login'
 toolbar = DebugToolbarExtension(app)
 
 # Load all of our blueprints
-# TODO - I want to make this more dynamic
-from app.blueprints.site import site_module
-from app.blueprints.cci import cci_module
-
-app.register_blueprint(site_module)
-app.register_blueprint(cci_module)
-#from app import views, models
-
-
+BLUEPRINT_PATH = app.config.get('BLUEPRINT_PATH',
+                                join(abspath(dirname(__file__)), 'blueprints'))
 @app.before_request
 def before_request():
     g.user = current_user
@@ -60,3 +55,14 @@ def generate_menu():
         left_menu=sorted(app.left_menu, key=lambda x: (x[2], x[1])),
         right_menu=sorted(app.right_menu, key=lambda x: (x[2], x[1]))
     )
+
+
+# Load pluggable blueprints. This is adapted from code in:
+# https://bitbucket.org/philpem/horizon/
+for name in listdir(BLUEPRINT_PATH):
+    if isdir(join(BLUEPRINT_PATH, name)) and \
+       exists(join(BLUEPRINT_PATH, name, '__init__.py')):
+        module = importlib.import_module('app.blueprints.' + name)
+
+        if hasattr(module, 'blueprint'):
+            app.register_blueprint(module.blueprint)

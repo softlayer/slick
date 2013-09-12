@@ -7,14 +7,12 @@ from flask.ext.login import login_required
 
 from app import app
 from app.utils.core import get_client
-from app.blueprints.cci import cci_module
 from app.blueprints.cci.forms import CreateCCIForm
 from app.blueprints.cci.manager import (all_instances, all_instance_options,
                                         get_instance, reload_instance,
                                         launch_instance, validate_instance)
 
 
-@cci_module.route('/add', methods=['GET', 'POST'])
 @login_required
 def create():
     # Setup the form choices here since we need access to the client object
@@ -55,7 +53,7 @@ def create():
 
                 flash('Configuration saved for future use.', 'success')
 
-            return redirect(url_for("cci_module.index"))
+            return redirect(url_for(".index"))
         else:
             flash(message, 'error')
 
@@ -65,9 +63,6 @@ def create():
     return render_template('cci_add.html', title='Create Instance', form=form)
 
 
-@cci_module.route('/', defaults={'page': 1})
-@cci_module.route('/index', defaults={'page': 1})
-@cci_module.route('/index/page/<int:page>')
 @login_required
 def index(page):
     instance_filter = {
@@ -89,7 +84,6 @@ def index(page):
     return render_template("cci_index.html", **payload)
 
 
-@cci_module.route('/priceCheck', methods=['GET', 'POST'])
 @login_required
 def price_check():
     form = CreateCCIForm()
@@ -107,15 +101,12 @@ def price_check():
     return render_template('cci_price_quote.html', order_template=results)
 
 
-@cci_module.route('/reload/<int:cci_id>')
 @login_required
 def reload_cci(cci_id):
     (success, message) = reload_instance(cci_id)
     return json.dumps({'success': success, 'message': message})
 
 
-@cci_module.route('/status')
-@cci_module.route('/status/<int:cci_id>')
 @login_required
 def status(cci_id):
     if not cci_id:

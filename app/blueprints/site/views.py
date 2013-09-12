@@ -5,14 +5,10 @@ from flask.ext.login import login_user, logout_user, login_required
 from SoftLayer import Client, SoftLayerAPIError
 
 from app import db, lm
-from app.blueprints.site import site_module
 from app.blueprints.site.forms import LoginForm
 from app.blueprints.site.models import User
 from app.utils.core import get_client
 
-
-@site_module.route('/')
-@site_module.route('/index')
 @login_required
 def index():
     user = g.user
@@ -24,10 +20,9 @@ def index():
     return render_template("site_index.html", title='Home', user=user)
 
 
-@site_module.route('/login', methods=['GET', 'POST'])
 def login():
     if g.user is not None and g.user.is_authenticated():
-        return redirect(url_for('site_module.index'))
+        return redirect(url_for('.index'))
     form = LoginForm()
     if form.validate_on_submit():
         auth = _authenticate_with_password(form.username.data,
@@ -41,7 +36,7 @@ def login():
             session['security_question_answered'] = False
             flash('Please answer one of your security questions to proceed.',
                   'success')
-            return redirect(url_for('security_question'))
+            return redirect(url_for('.security_question'))
         else:
             session['security_question_answered'] = True
 
@@ -67,10 +62,10 @@ def login():
 
         if session['use_two_factor']:
             session['next_page'] = request.args.get('next')
-            return redirect(url_for('site_module.two_factor_login'))
+            return redirect(url_for('.two_factor_login'))
 
         return redirect(request.args.get('next') or
-                        url_for('site_module.index'))
+                        url_for('.index'))
     # @TODO - This always displays
 #    flash("LOGIN FAILED!")
     return render_template('site_login.html',
@@ -78,10 +73,9 @@ def login():
                            form=form)
 
 
-@site_module.route('/logout')
 def logout():
     logout_user()
-    return redirect(url_for('site_module.index'))
+    return redirect(url_for('.index'))
 
 
 @lm.user_loader

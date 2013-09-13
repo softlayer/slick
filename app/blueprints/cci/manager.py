@@ -44,8 +44,12 @@ def all_instances(instance_filter):
 
 
 def change_port_speed(instance_id, nic, speed):
+    public = True
+    if 'eth0' == nic:
+        public = False
+
     try:
-        get_cci_manager().change_port_speed(instance_id, nic, speed)
+        get_cci_manager().change_port_speed(instance_id, public, speed)
         success = True
         message = "Port speed changed. It may take up to a minute for this " \
                   "to take effect"

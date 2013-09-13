@@ -7,10 +7,26 @@ from flask.ext.login import login_required
 
 from app import app
 from app.utils.core import get_client
+from app.utils.nested_dict import lookup
 from app.blueprints.cci.forms import CreateCCIForm
 from app.blueprints.cci.manager import (all_instances, all_instance_options,
-                                        get_instance, reload_instance,
-                                        launch_instance, validate_instance)
+                                        change_port_speed, get_instance,
+                                        reload_instance, launch_instance,
+                                        validate_instance)
+
+
+@login_required
+def change_nic_speed(cci_id, nic, speed):
+    """ This function will alter the port speed of the specified NIC on the
+    CCI. It's designed to be called via AJAX.
+
+    :param int instance_id: The ID of the instance to change
+    :param string nic: The identifier of the network interface to change
+    :param int speed: The speed to change the interface to
+    """
+
+    (success, message) = change_port_speed(cci_id, nic, speed)
+    return json.dumps({'success': success, 'message': message})
 
 
 @login_required
@@ -61,6 +77,29 @@ def create():
         flash('There are validation errors with your submission.', 'error')
 
     return render_template('cci_add.html', title='Create Instance', form=form)
+
+
+@login_required
+def get_password(cci_id, username):
+    """ This function is called via AJAX to retrieve the root/admin password
+    for the specified machine and account.
+
+    :param int cci_id: The CCI ID to retrieve the password for.
+    :param string username: The specific admin account that owns the password.
+    """
+
+    instance = get_instance(cci_id, True)
+
+    if not instance:
+        return 'Invalid account'
+
+    password = 'Password not found'
+
+    for account in lookup(instance, 'operatingSystem', 'passwords'):
+        if username == account['username']:
+            password = account['password']
+
+    return password
 
 
 @login_required
@@ -119,3 +158,16 @@ def status(cci_id):
         'active': instance['active'],
         'row_html': html,
     })
+
+
+@login_required
+def view(cci_id):
+    instance = get_instance(cci_id)
+
+    payload = {}
+    payload['title'] = 'View CCI'
+    payload['subheader'] = instance['fqdn']
+    payload['object'] = instance
+    payload['module'] = 'cci_module'
+
+    return render_template('cci_view.html', **payload)

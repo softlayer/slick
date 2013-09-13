@@ -21,13 +21,21 @@ blueprint.add_url_rule('/', view_func=views.index, defaults={'page': 1})
 blueprint.add_url_rule('/index', view_func=views.index, defaults={'page': 1})
 blueprint.add_url_rule('/index/page/<int:page>', view_func=views.index)
 
-# CCI price check (AJAX call)
+# CCI Price Check (AJAX call)
 blueprint.add_url_rule('/priceCheck', view_func=views.price_check,
                        methods=['GET', 'POST'])
 
-# CCI reload
+# CCI Reload
 blueprint.add_url_rule('/reload/<int:cci_id>', view_func=views.reload_cci)
 
-# CCI status (AJAX call)
+# CCI Status (AJAX call)
 blueprint.add_url_rule('/status', view_func=views.status)
 blueprint.add_url_rule('/status/<int:cci_id>', view_func=views.status)
+
+# CCI View
+blueprint.add_url_rule('/view/<int:cci_id>', view_func=views.view)
+blueprint.add_url_rule('/changeSpeed/<int:cci_id>/<string:nic>/<int:speed>',
+                       view_func=views.change_nic_speed)
+blueprint.add_url_rule('/getPassword/', view_func=views.get_password)
+blueprint.add_url_rule('/getPassword/<int:cci_id>/<string:username>',
+                       view_func=views.get_password)

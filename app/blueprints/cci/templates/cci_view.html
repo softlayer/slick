@@ -1,0 +1,141 @@
+{% extends "layout/base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="col-md-6">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Core System</h3>
+        </div>
+        <div class="panel-body">
+          <dl class="dl-horizontal">
+            <dt>Data Center</dt>
+            <dd>{{ object.datacenter }}</dd>
+            <dt>Memory</dt>
+            <dd>{% if object.memory >= 1024 %}{{ object.memory // 1024 }}{% else %}{{ object.memory }}{% endif %} GB</dd>
+            <dt>CPUs</dt>
+            <dd>{{ object.cpu }}</dd>
+            <dt>Public IP</dt>
+            <dd>{{ object.public }}</dd>
+            <dt>Private IP</dt>
+            <dd>{{ object.private }}</dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Software</h3>
+        </div>
+        <div class="panel-body">
+          <dl class="dl-horizontal">
+            <dt>Operating System</dt>
+            <dd>{{ object.os }}</dd>
+            {% for username in object.usernames %}
+            <dt>Username</dt>
+            <dd>{{ username }}</dd>
+            <dt>Password</dt>
+            <dd id="{{ username }}-pw"><span class="text-info" style="cursor: pointer; cursor: hand;" onclick="getPassword('{{ object.id }}', '{{ username }}')">Click Here for Password</span></dd>
+            {% endfor %}
+          </dl>
+        </div>
+      </div>
+    </div>
+</div>
+
+<h2><small>Network Information</small></h2>
+<div class="container">
+  {% for net in object.network %}
+    {% set netname = net.name %}
+    {% if net.port is defined %}
+      {% set netname = netname + net.port|string %}
+    {% endif %}
+    {% set speed_url = "#" %}
+
+  <div class="col-md-6">
+    <div id="nic_{{ netname }}" class="panel {% if 'ACTIVE' == net.status %}panel-success{% else %}panel-danger{% endif %}">
+      <div class="panel-heading">
+        <h3 class="panel-title">
+          NIC {{ netname }} - 
+          {% if netname in ['eth0', 'eth1'] %}
+            {% if 'ACTIVE' == net.status %}
+              <a id="port_{{ object.id }}_{{ netname }}_0" href="{{ url_for(module + '.change_nic_speed', cci_id=object.id, nic=netname, speed=0) }}" class="btn btn-xs btn-default" onclick="disablePort({{ object.id }}, '{{ netname }}'); return false;">Active</a>
+            {% else %}
+              <a id="port_{{ object.id }}_{{ netname }}_{{ net.maxSpeed }}" href="{{ url_for(module + '.change_nic_speed', cci_id=object.id, nic=netname, speed=net.maxSpeed) }}" class="btn btn-xs btn-default" onclick="changeSpeed({{ object.id }}, '{{ netname }}', {{ net.maxSpeed }}); return false;">Disabled</a>
+            {% endif %}
+          {% else %}
+              <span class="{% if 'ACTIVE' == net.status %}text-success{% else %}text-error{% endif %}"><strong>{{ net.status }}</strong></span>
+          {% endif %}
+        </h3>
+      </div>
+      <div class="panel-body">
+        <dl class="dl-horizontal">
+          <dt>Speed</dt>
+          <dd>
+            {% if netname in ['eth0', 'eth1'] %}
+              <div class="btn-group btn-group-xs">
+              {% for speed, label in [(10, '10Mb'), (100, '100 Mb'), (1000, '1 Gb'), (10000, '10 Gb')] %}
+                {% if speed <= net.maxSpeed %}<a id="port_{{ object.id }}_{{ netname }}_{{ speed }}" href="{{ url_for(module + '.change_nic_speed', cci_id=object.id, nic=netname, speed=speed) }}" class="btn {% if speed == net.speed %}btn-primary{% else %}btn-default{% endif %}" onclick="changeSpeed({{ object.id }}, '{{ netname }}', {{ speed }}); return false;">{{ label }}</a>{% endif %}
+              {% endfor %}
+              </div>
+            {% else %}
+              {{ net.speed }} Mbps
+            {% endif %}
+          </dd>
+          <dt>IP Address</dt>
+          <dd>{{ net.ip }}</dd>
+          <dt>MAC Address</dt>
+          <dd>{{ net.mac }}</dd>
+          {% if net.subnet %}
+          <dt>Gateway</dt>
+          <dd>{{ net.subnet.gateway }}</dd>
+          <dt>Netmask</dt>
+          <dd>{{ net.subnet.netmask }}</dd>
+          <dt>Broadcast</dt>
+          <dd>{{ net.subnet.broadcast }}</dd>
+          {% endif %}
+        </dl>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script type="text/javascript">
+function getPassword(id, username) {
+  var pwid = $('#' + username + '-pw')
+  pwid.text("Loading...");
+  pwid.load("{{ url_for(module + '.get_password') }}" + id + "/" + username);
+}
+
+function changeSpeed(cciId, portName, speed) {
+  var href = $('#port_' + cciId + '_' + portName + '_' + speed).attr('href')
+
+  $.get(href).done(function(data) {
+      result = $.parseJSON(data);
+      
+      var messageType = 'error';
+      if (result.success) {
+        messageType = 'success';
+
+        // Auto-reload the window after 5 seconds to try and pick up the changes
+        window.setTimeout(function(){location.reload()},5000);
+      }
+      
+      add_notification(result.message, messageType);
+    });
+}
+
+function disablePort(cciId, portName) {
+  bootbox.confirm("<h3 class='text-danger'>Warning!</h3>This will deactivate this NIC on the CCI, preventing access to the assigned IP address!<br><br>Are you sure you want to continue?", function(result) {
+      if (result) {
+        changeSpeed(cciId, portName, 0);
+      }
+  });
+}
+</script>
+{% endblock %}

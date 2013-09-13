@@ -3,28 +3,30 @@
 {% block content %}
 {% if instances %}
 {{ helpers.pagination('cci_module.index', current_page, total_items) }}
-<table class="table table-striped table-bordered table-responsive">
-  <thead>
-    <tr>
-      <th style="width: 25%">Hostname</th>
-      <th style="width: 10%">Datacenter</th>
-      <th style="width: 15%">Public</th>
-      <th style="width: 15%">Private</th>
-      <th style="width: 5%">CPU</th>
-      <th style="width: 5%">Memory</th>
-      <th style="width: 15%">Status</th>
-      <th style="width: 10%">Actions</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for instance in instances %}
-    {% if not instance.active or not instance.datacenter %}
-      {% do inactive_ccis.append(instance.id) %}
-    {% endif %}
-    <tr id="cci_{{ instance.id }}">{% include 'cci_instance_row.html' %}</tr>
-    {% endfor %}
-  </tbody>
-</table>
+<div class="table-responsive">
+  <table class="table table-striped table-bordered">
+    <thead>
+      <tr>
+        <th style="width: 25%">Hostname</th>
+        <th style="width: 10%">Datacenter</th>
+        <th style="width: 15%">Public</th>
+        <th style="width: 15%">Private</th>
+        <th style="width: 5%">CPU</th>
+        <th style="width: 5%">Memory</th>
+        <th style="width: 15%">Status</th>
+        <th style="width: 10%">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for instance in instances %}
+      {% if not instance.active or not instance.datacenter %}
+        {% do inactive_ccis.append(instance.id) %}
+      {% endif %}
+      <tr id="cci_{{ instance.id }}">{% include 'cci_instance_row.html' %}</tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 {{ helpers.pagination('cci_module.index', current_page, total_items) }}
 {% else %}
 <div class="panel panel-danger">

@@ -39,7 +39,7 @@ lm.init_app(app)
 lm.login_view = 'site_module.login'
 
 # Enable the debug toolbar
-toolbar = DebugToolbarExtension(app)
+# toolbar = DebugToolbarExtension(app)
 
 # Load all of our blueprints
 BLUEPRINT_PATH = app.config.get('BLUEPRINT_PATH',

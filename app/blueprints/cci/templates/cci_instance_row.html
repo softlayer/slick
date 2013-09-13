@@ -26,10 +26,10 @@
             Action <span class="caret"></span>
     </button>
     <ul class="dropdown-menu">
-      <li><a href="/compute/view/{{ instance.id }}"><i class="icon-search"></i> View</a></li>
+      <li><a href="{{ url_for('.view', cci_id=instance.id) }}"><i class="icon-search"></i> View</a></li>
       <li><a href="/domain/quick_register_cci/{{ instance.domain }}/{{ instance.hostname }}/{{ instance.public }}"><i class="icon-globe"></i> Register in DNS</a></li>
       <li><a href="/compute/clone_cci/{{ instance.id }}"><i class="icon-share"></i> Order Another</a></li>
-      <li><a href="{{ url_for('cci_module.reload_cci', cci_id=instance.id) }}" id="reload_{{ instance.id }}" onclick="reloadCCI({{ instance.id }}); return false;"><i class="icon-repeat"></i> Reload</a></li>
+      <li><a href="{{ url_for('.reload_cci', cci_id=instance.id) }}" id="reload_{{ instance.id }}" onclick="reloadCCI({{ instance.id }}); return false;"><i class="icon-repeat"></i> Reload</a></li>
       <li><a href="/compute/cancel/{{ instance.id }}"><i class="icon-trash"></i> Cancel</a></li>
     </ul>
   </div>

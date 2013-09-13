@@ -6,7 +6,7 @@
       <span class="icon-bar"></span>
       <span class="icon-bar"></span>
     </button>
-    <a class="navbar-brand" href="#">SoftLayer</a>
+    <span class="navbar-brand">SoftLayer</span>
   </div>
 
   <!-- Collect the nav links, forms, and other content for toggling -->
@@ -26,24 +26,6 @@
           <li{% if endpoint == request.endpoint %} class="active"{% endif %}><a href="{{ url_for(endpoint)}}">{{ label }}</a></li>
         {% endif %}
       {% endfor %}
-{#
-      <li{% if not section or section == 'dashboard' %} class="active"{% endif %}><a href="{{ url_for('site_module.index') }}">Dashboard</a></li>
-      <li class="dropdown">
-        <a href="#" class="dropdown-toggle" data-toggle="dropdown">CCI <b class="caret"></b></a>
-        <ul class="dropdown-menu">
-          <li><a href="#">List Instances</a></li>
-          <li><a href="#">Launch Instance</a></li>
-        </ul>
-      </li>
-      <li class="dropdown">
-        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Servers <b class="caret"></b></a>
-        <ul class="dropdown-menu">
-          <li><a href="#">List Servers</a></li>
-          <li><a href="#">Order Dedicated</a></li>
-          <li><a href="#">Order Bare Metal Cloud</a></li>
-        </ul>
-      </li>
-#}
     </ul>
 
     <form class="navbar-form navbar-left" role="search">
@@ -63,7 +45,6 @@
       {% for endpoint, label, order in right_menu %}
         <li{% if endpoint == request.endpoint %} class="active"{% endif %}><a href="{{ url_for(endpoint)}}">{{ label }}</a></li>
       {% endfor %}
-{#      <li><a href="{{ url_for('site_module.logout') }}">Logout</a></li> #}
     </ul>
   </div><!-- /.navbar-collapse -->
 </nav>

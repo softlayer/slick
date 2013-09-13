@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Slick{% if title %} - {{title}}{% endif %}</title>
+    <title>Slick{% if title %} - {{title}}{% if subheader %} - {{ subheader }}{% endif %}{% endif %}</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Bootstrap -->
@@ -51,6 +51,7 @@
     {# Flash messages end #}
 
     <h1><small>{{ title }}</small></h1>
+    {% if subheader %}<h2><small>{{ subheader }}</small></h2><br>{% endif %}
 
     {# Page Content #}
     {% block content %}{% endblock %}

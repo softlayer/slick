@@ -6,8 +6,8 @@
 
   {# Hostname and Domain #}
   <div class="form-group">
-    <label for="hostname" class="col-lg-2 control-label">Name</label>
-    <div class="col-lg-2{% if form.hostname.errors %} has-error{% endif %}">
+    <label for="hostname" class="col-md-2 control-label">Name</label>
+    <div class="col-md-2{% if form.hostname.errors %} has-error{% endif %}">
       {{form.hostname(class="form-control", autofocus=true, placeholder='Hostname')}}
       {% if form.hostname.errors and form.hostname.errors is iterable %}
       <span class="help-block">
@@ -19,7 +19,7 @@
       </span>
       {% endif %}
     </div>
-    <div class="col-lg-2{% if form.domain.errors %} has-error{% endif %}">
+    <div class="col-md-2{% if form.domain.errors %} has-error{% endif %}">
       {{form.domain(class="form-control", placeholder='Domain')}}
       {% if form.domain.errors and form.domain.errors is iterable %}
       <span class="help-block">
@@ -47,8 +47,8 @@
 
   {# NIC Speed #}
   <div class="form-group">
-    <label for="network" class="col-lg-2 control-label">Network</label>
-    <div class="col-lg-4{% if form.network.errors %} has-error{% endif %}">
+    <label for="network" class="col-md-2 control-label">Network</label>
+    <div class="col-md-4{% if form.network.errors %} has-error{% endif %}">
       {% for option in form.network %}
         <label class="radio-inline">
           <input type="radio" name="{{ option.name }}" id="{{ option.id }}" value="{{ option.data }}"{% if option.checked %} checked{% endif %}> {{ option.label }}
@@ -67,12 +67,12 @@
   </div>
 
   <div class="row">
-    <div class="col-lg-offset-2 col-lg-4" id="price_div"></div>
+    <div class="col-md-offset-2 col-md-4" id="price_div"></div>
   </div>
 
   {# Submit Buttons #}
   <div class="form-group">
-    <div class="col-lg-offset-2 col-lg-10">
+    <div class="col-md-offset-2 col-md-10">
       <button type="submit" class="btn btn-primary">Launch Instance</button>
       <button type="submit" class="btn btn-success" id="price_submit">Get Price Quote</button>
       <a href="{{ url_for('cci_module.index') }}" class="btn btn-default">Cancel</a>

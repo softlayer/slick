@@ -25,6 +25,12 @@ blueprint.add_url_rule('/index/page/<int:page>', view_func=views.index)
 blueprint.add_url_rule('/priceCheck', view_func=views.price_check,
                        methods=['GET', 'POST'])
 
+# CCI Reboot
+blueprint.add_url_rule('/reboot/<int:cci_id>/hard',
+                       view_func=views.hard_reboot_cci)
+blueprint.add_url_rule('/reboot/<int:cci_id>/soft',
+                       view_func=views.soft_reboot_cci)
+
 # CCI Reload
 blueprint.add_url_rule('/reload/<int:cci_id>', view_func=views.reload_cci)
 

@@ -11,8 +11,8 @@ from app.utils.nested_dict import lookup
 from app.blueprints.cci.forms import CreateCCIForm
 from app.blueprints.cci.manager import (all_instances, all_instance_options,
                                         change_port_speed, get_instance,
-                                        reload_instance, launch_instance,
-                                        validate_instance)
+                                        reboot_instance, reload_instance,
+                                        launch_instance, validate_instance)
 
 
 @login_required
@@ -103,6 +103,12 @@ def get_password(cci_id, username):
 
 
 @login_required
+def hard_reboot_cci(cci_id):
+    (success, message) = reboot_instance(cci_id, False)
+    return json.dumps({'success': success, 'message': message})
+
+
+@login_required
 def index(page):
     instance_filter = {
         'limit': app.config['PAGE_SIZE'],
@@ -143,6 +149,12 @@ def price_check():
 @login_required
 def reload_cci(cci_id):
     (success, message) = reload_instance(cci_id)
+    return json.dumps({'success': success, 'message': message})
+
+
+@login_required
+def soft_reboot_cci(cci_id):
+    (success, message) = reboot_instance(cci_id)
     return json.dumps({'success': success, 'message': message})
 
 

@@ -1,10 +1,8 @@
 {% if instance.active and instance.datacenter %}
   {% set status_class = 'text-success' %}
-  {% set status_colspan = 1 %}
   {% set instance_active = 1 %}
 {% else %}
   {% set status_class = 'text-danger' %}
-  {% set status_colspan = 2 %}
   {% set instance_active = 0 %}
 {% endif %}
 <td class="cci_hostname">{{ instance.fqdn}}</td>
@@ -13,25 +11,27 @@
 <td>{{ instance.private }}</td>
 <td>{{ instance.cpu }}</td>
 <td>{{ instance.memory // 1024 }} GB</td>
-<td colspan="{{ status_colspan }}">
+<td>
 {% if not instance_active %}
   <img src="/static/img/ajax-loader-bar.gif" alt="Action in Progress">
 {% endif %}
 <span class="{{ status_class }}">{{ instance.status }}</span>
 </td>
-{% if instance_active %}
 <td>
   <div class="btn-group">
     <button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown">
             Action <span class="caret"></span>
     </button>
     <ul class="dropdown-menu">
-      <li><a href="{{ url_for('.view', cci_id=instance.id) }}"><i class="icon-search"></i> View</a></li>
-      <li><a href="/domain/quick_register_cci/{{ instance.domain }}/{{ instance.hostname }}/{{ instance.public }}"><i class="icon-globe"></i> Register in DNS</a></li>
-      <li><a href="/compute/clone_cci/{{ instance.id }}"><i class="icon-share"></i> Order Another</a></li>
-      <li><a href="{{ url_for('.reload_cci', cci_id=instance.id) }}" id="reload_{{ instance.id }}" onclick="reloadCCI({{ instance.id }}); return false;"><i class="icon-repeat"></i> Reload</a></li>
-      <li><a href="/compute/cancel/{{ instance.id }}"><i class="icon-trash"></i> Cancel</a></li>
+      <li><a href="{{ url_for('.view', cci_id=instance.id) }}">View</a></li>
+      <li><a href="/domain/quick_register_cci/{{ instance.domain }}/{{ instance.hostname }}/{{ instance.public }}">Register in DNS</a></li>
+      {% if instance_active %}
+      <li><a href="/compute/clone_cci/{{ instance.id }}">Order Another</a></li>
+      <li><a href="{{ url_for('.soft_reboot_cci', cci_id=instance.id) }}" id="soft_reboot_{{ instance.id }}" onclick="cciAction({{ instance.id }}, 'soft_reboot'); return false;">Soft Reboot</a></li>
+      <li><a href="{{ url_for('.hard_reboot_cci', cci_id=instance.id) }}" id="hard_reboot_{{ instance.id }}" onclick="cciAction({{ instance.id }}, 'hard_reboot'); return false;">Hard Reboot</a></li>
+      <li><a href="{{ url_for('.reload_cci', cci_id=instance.id) }}" id="reload_{{ instance.id }}" onclick="cciAction({{ instance.id }}, 'reload'); return false;">Reload</a></li>
+      <li><a href="/compute/cancel/{{ instance.id }}">Cancel</a></li>
+      {% endif %}
     </ul>
   </div>
 </td>
-{% endif %}

@@ -35,17 +35,9 @@ $(document).ready(function() {
 });
 
 function add_notification(message, type) {
-    var div = $('#notifications');
-    var alert_class = 'alert-danger';
-
     if (type == 'success') {
-	alert_class = 'alert-success';
-	window.setTimeout(function() {
-	    $(".alert-success").fadeTo(1000, 0).slideUp(1000, function(){
-		$(this).remove(); 
-	    });
-	}, 2000);
+        toastr.success(message, '', {'closeButton': true});
+    } else {
+        toastr.error(message, '', {'closeButton': true, 'timeOut': 0});
     }
-
-    div.append('<div class="alert ' + alert_class + ' fade in"><a class="close" data-dismiss="alert" href="#" aria-hidden="true">&times;</a>' + message + '<br/></div>');
 }

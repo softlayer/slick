@@ -9,6 +9,7 @@ from app.blueprints.site.forms import LoginForm
 from app.blueprints.site.models import User
 from app.utils.core import get_client
 
+
 @login_required
 def index():
     user = g.user

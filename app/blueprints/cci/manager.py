@@ -131,6 +131,28 @@ def launch_instance(hostname, domain, os, cpus, memory, network, datacenter=''):
     return (success, message)
 
 
+def reboot_instance(instance_id, soft=True):
+    """ Provides a single interface function for rebooting a CCI.
+
+    :param int instance_id: The ID of the CloudCompute instance to reboot.
+    :param bool soft: Flag to determine if this should be a soft or hard
+                      reboot. [Default: true (soft)]
+    """
+    try:
+        vg = get_client()['Virtual_Guest']
+        if soft:
+            vg.rebootSoft(id=instance_id)
+        else:
+            vg.rebootHard(id=instance_id)
+        success = True
+        message = 'Reboot request sent to instance.'
+    except SoftLayerAPIError as exception:
+        success = False
+        message = str(exception)
+
+    return (success, message)
+
+
 def reload_instance(instance_id):
     """ Wrapper for the CCIManager's reload_instance() call.
 

@@ -2,9 +2,9 @@
 {% set inactive_ccis = [] %}
 {% block content %}
 {% if instances %}
-{{ helpers.pagination('cci_module.index', current_page, total_items) }}
+{# { helpers.pagination('cci_module.index', current_page, total_items) } #}
 <div class="table-responsive">
-  <table class="table table-striped table-bordered">
+  <table class="table table-striped table-bordered" id="cci_table">
     <thead>
       <tr>
         <th style="width: 25%">Hostname</th>
@@ -27,7 +27,7 @@
     </tbody>
   </table>
 </div>
-{{ helpers.pagination('cci_module.index', current_page, total_items) }}
+{# { helpers.pagination('cci_module.index', current_page, total_items) } #}
 {% else %}
 <div class="panel panel-danger">
   <div class="panel-heading">Error</div>
@@ -61,10 +61,20 @@ cciList.push({{ id }});
 {% endfor %}
 {% endif %}
 
-function reloadCCI(cciId) {
-    var href = $('#reload_' + cciId).attr('href')
+function cciAction(cciId, action) {
+    var href = $('#' + action + '_' + cciId).attr('href')
+    if (action == 'reload') {
+      var message = 'This will erase the CCI and restore it to the base OS!';
+    } else if (action == 'soft_reboot') {
+      var message = 'This will attempt to reboot the CCI using the normal operating system method.';
+    } else if (action == 'hard_reboot') {
+      var message = 'This will simulate a power cycle of the CCI!';
+    } else {
+      var message = 'You are attempting to perform an unknown action.';
+    }
+
     var hostname = $('#cci_' + cciId).find('.cci_hostname').html();
-    bootbox.confirm("<h3 class='text-danger'>" + hostname + "</h3>This will erase the CCI and restore it to the base OS!<br><br>Are you sure you want to continue?", function(result) {
+    bootbox.confirm("<h3 class='text-danger'>" + hostname + "</h3>" + message + "<br><br>Are you sure you want to continue?", function(result) {
         if (result) {
           $.get(href).done(function(data) {
               result = $.parseJSON(data);
@@ -80,5 +90,9 @@ function reloadCCI(cciId) {
         }
       }); 
 }
+
+$(document).ready(function() {
+    $('#cci_table').dataTable();
+});
 </script>
 {% endblock %}

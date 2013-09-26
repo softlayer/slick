@@ -1,0 +1,36 @@
+<table class="table table-condensed table-striped">
+  <thead>
+    <tr>
+      <th>Description</th>
+      <th>Price</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% set found_prices = [] %}
+    {% for item in order_template.prices %}
+      {# TODO - This needs to support hourly vs. monthly #}
+      {% set price_var = 'recurringFee' %}
+      {% set price = item.get(price_var, 0)|int %}
+
+      {% if price %}
+        {% do found_prices.append(price) %}
+        <tr>
+          <td>{{ item.item.description }}</td>
+          <td>{{ "$%.2f"|format(price) }}</td>
+        </tr>
+      {% endif %}
+    {% endfor %}
+    <tr class="success">
+      <td style="border-top: 1px solid #000000;">Estimated Total</td>
+      <td style="border-top: 1px solid #000000;">
+        {% set total = 0 %}
+        {%- for price in found_prices %}
+          {% set total = total + price %}
+          {% if loop.last %}{{ "$%.2f"|format(total) }} *{% endif %}
+        {% endfor %}
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<p class="text-primary"><small>* This does not reflect any account level discounts you may have. Items not listed do not have a charge associated with them.</small></p>

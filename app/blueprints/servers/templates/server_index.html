@@ -1,0 +1,96 @@
+{% extends "layout/base.html" %}
+{% set inactive_servers = [] %}
+{% block content %}
+{% if servers %}
+<div class="table-responsive">
+  <table class="table table-striped table-bordered" id="server_table">
+    <thead>
+      <tr>
+        <th style="width: 25%">Hostname</th>
+        <th style="width: 10%">Datacenter</th>
+        <th style="width: 15%">Public</th>
+        <th style="width: 15%">Private</th>
+        <th style="width: 5%">CPU</th>
+        <th style="width: 5%">Memory</th>
+        <th style="width: 15%">Status</th>
+        <th style="width: 10%">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for server in servers %}
+      {% if not server.active or not server.datacenter %}
+        {% do inactive_servers.append(server.id) %}
+      {% endif %}
+      <tr id="server_{{ server.id }}">{% include 'server_instance_row.html' %}</tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="panel panel-danger">
+  <div class="panel-heading">Error</div>
+  <div class="panel-body">No servers found on your account.</div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block javascript %}
+<script type="text/javascript">
+var checkServers = false;
+var serverList = Array();
+
+setInterval(function() {
+    for (var i=0; i<serverList.length; i++) {
+      var serverId = serverList[i];
+      $.get("{{ url_for('server_module.status') }}/" + serverId).done(function(data) {
+          result = $.parseJSON(data);
+          $('#server_' + serverId).html(result.row_html);
+          if (result.active) {
+            var index = serverList.indexOf(serverId);
+            serverList.splice(index, 1);
+          }
+        });
+    }
+}, 5000);
+
+{% if inactive_servers %}
+{% for id in inactive_servers %}
+serverList.push({{ id }});
+{% endfor %}
+{% endif %}
+
+function serverAction(serverId, action) {
+    var href = $('#' + action + '_' + serverId).attr('href')
+    if (action == 'reload') {
+      var message = 'This will erase the server and restore it to the base OS!';
+    } else if (action == 'soft_reboot') {
+      var message = 'This will attempt to reboot the server using the normal operating system method.';
+    } else if (action == 'hard_reboot') {
+      var message = 'This will simulate a power cycle of the server!';
+    } else {
+      var message = 'You are attempting to perform an unknown action.';
+    }
+
+    var hostname = $('#server_' + serverId).find('.server_hostname').html();
+    bootbox.confirm("<h3 class='text-danger'>" + hostname + "</h3>" + message + "<br><br>Are you sure you want to continue?", function(result) {
+        if (result) {
+          $.get(href).done(function(data) {
+              result = $.parseJSON(data);
+
+              var messageType = 'error';
+              if (result.success) {
+                messageType = 'success';
+                serverList.push(serverId);
+              }
+
+              add_notification(result.message, messageType);
+            });
+        }
+      }); 
+}
+
+$(document).ready(function() {
+    $('#server_table').dataTable();
+});
+</script>
+{% endblock %}

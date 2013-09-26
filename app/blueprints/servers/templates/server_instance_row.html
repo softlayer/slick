@@ -1,0 +1,39 @@
+{% if server.active and server.datacenter %}
+  {% set status_class = 'text-success' %}
+  {% set server_active = 1 %}
+{% else %}
+  {% set status_class = 'text-danger' %}
+  {% set server_active = 0 %}
+{% endif %}
+<td class="cci_hostname">{{ server.fqdn}}</td>
+<td>{{ server.datacenter }}</td>
+<td>{{ server.public }}</td>
+<td>{{ server.private }}</td>
+<td>{{ server.cpu }}</td>
+<td>{{ server.memory }} GB</td>
+<td>
+{% if not server_active %}
+  <img src="/static/img/ajax-loader-bar.gif" alt="Action in Progress">
+{% endif %}
+<span class="{{ status_class }}">{{ server.status }}</span>
+</td>
+<td>
+  <div class="btn-group">
+    <button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown">
+            Action <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu">
+      {#
+      <li><a href="{{ url_for('.view', cci_id=server.id) }}">View</a></li>
+      <li><a href="/domain/quick_register_cci/{{ server.domain }}/{{ server.hostname }}/{{ server.public }}">Register in DNS</a></li>
+      {% if server_active %}
+      <li><a href="/compute/clone_cci/{{ server.id }}">Order Another</a></li>
+      <li><a href="{{ url_for('.soft_reboot_cci', cci_id=server.id) }}" id="soft_reboot_{{ server.id }}" onclick="cciAction({{ server.id }}, 'soft_reboot'); return false;">Soft Reboot</a></li>
+      <li><a href="{{ url_for('.hard_reboot_cci', cci_id=server.id) }}" id="hard_reboot_{{ server.id }}" onclick="cciAction({{ server.id }}, 'hard_reboot'); return false;">Hard Reboot</a></li>
+      <li><a href="{{ url_for('.reload_cci', cci_id=server.id) }}" id="reload_{{ server.id }}" onclick="cciAction({{ server.id }}, 'reload'); return false;">Reload</a></li>
+      <li><a href="/compute/cancel/{{ server.id }}">Cancel</a></li>
+      {% endif %}
+#}
+    </ul>
+  </div>
+</td>

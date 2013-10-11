@@ -4,7 +4,7 @@ from wtforms.validators import Required
 from wtformsparsleyjs import TextField, SelectField
 
 
-class CreateBMCForm(Form):
+class CreateHourlyForm(Form):
     bare_metal = HiddenField(default='1')
     location = SelectField('Data Center', default='FIRST_AVAILABLE')
     hostname = TextField('Hostname', validators=[Required()])

@@ -1,7 +1,7 @@
 {% extends "layout/base.html" %}
 
 {% block content %}
-<form action="{{ url_for('cci_module.create') }}" method="post" id='cci_add_form' class="form-horizontal" role="form">
+<form action="{{ url_for('vm_module.create') }}" method="post" id='vm_add_form' class="form-horizontal" role="form">
   {{form.hidden_tag()}}
 
   {# Hostname and Domain #}
@@ -75,7 +75,7 @@
     <div class="col-md-offset-2 col-md-10">
       <button type="submit" class="btn btn-primary">Launch Instance</button>
       <button type="submit" class="btn btn-success" id="price_submit">Get Price Quote</button>
-      <a href="{{ url_for('cci_module.index') }}" class="btn btn-default">Cancel</a>
+      <a href="{{ url_for('vm_module.index') }}" class="btn btn-default">Cancel</a>
     </div>
   </div>
 </form>
@@ -86,12 +86,12 @@
 $('#price_submit').click(function(event) {
     event.preventDefault();
 
-    valid = $('#cci_add_form').parsley('validate');
+    valid = $('#vm_add_form').parsley('validate');
     
     if (valid) {
       div = $('#price_div');
       div.html('<img src="/static/img/ajax-loader.gif" alt="Loading Price Quote"> Getting Quote');
-      $.post('{{ url_for('cci_module.price_check') }}', $('#cci_add_form').serialize()).done(function(data) { div.html(data) });
+      $.post('{{ url_for('vm_module.price_check') }}', $('#vm_add_form').serialize()).done(function(data) { div.html(data) });
     }
 });
 

@@ -71,6 +71,7 @@ def login():
 #    flash("LOGIN FAILED!")
     return render_template('site_login.html',
                            title='Sign In',
+                           hide_title=True,
                            form=form)
 
 

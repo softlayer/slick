@@ -5,7 +5,7 @@
   {% set status_class = 'text-danger' %}
   {% set server_active = 0 %}
 {% endif %}
-<td class="cci_hostname">{{ server.fqdn}}</td>
+<td class="server_hostname">{{ server.fqdn}}</td>
 <td>{{ server.datacenter }}</td>
 <td>{{ server.public }}</td>
 <td>{{ server.private }}</td>
@@ -24,13 +24,13 @@
     </button>
     <ul class="dropdown-menu">
       {#
-      <li><a href="{{ url_for('.view', cci_id=server.id) }}">View</a></li>
-      <li><a href="/domain/quick_register_cci/{{ server.domain }}/{{ server.hostname }}/{{ server.public }}">Register in DNS</a></li>
+      <li><a href="{{ url_for('.view', server_id=server.id) }}">View</a></li>
+      <li><a href="/domain/quick_register_server/{{ server.domain }}/{{ server.hostname }}/{{ server.public }}">Register in DNS</a></li>
       {% if server_active %}
-      <li><a href="/compute/clone_cci/{{ server.id }}">Order Another</a></li>
-      <li><a href="{{ url_for('.soft_reboot_cci', cci_id=server.id) }}" id="soft_reboot_{{ server.id }}" onclick="cciAction({{ server.id }}, 'soft_reboot'); return false;">Soft Reboot</a></li>
-      <li><a href="{{ url_for('.hard_reboot_cci', cci_id=server.id) }}" id="hard_reboot_{{ server.id }}" onclick="cciAction({{ server.id }}, 'hard_reboot'); return false;">Hard Reboot</a></li>
-      <li><a href="{{ url_for('.reload_cci', cci_id=server.id) }}" id="reload_{{ server.id }}" onclick="cciAction({{ server.id }}, 'reload'); return false;">Reload</a></li>
+      <li><a href="/compute/clone_server/{{ server.id }}">Order Another</a></li>
+      <li><a href="{{ url_for('.soft_reboot_server', server_id=server.id) }}" id="soft_reboot_{{ server.id }}" onclick="serverAction({{ server.id }}, 'soft_reboot'); return false;">Soft Reboot</a></li>
+      <li><a href="{{ url_for('.hard_reboot_server', server_id=server.id) }}" id="hard_reboot_{{ server.id }}" onclick="serverAction({{ server.id }}, 'hard_reboot'); return false;">Hard Reboot</a></li>
+      <li><a href="{{ url_for('.reload_server', server_id=server.id) }}" id="reload_{{ server.id }}" onclick="serverAction({{ server.id }}, 'reload'); return false;">Reload</a></li>
       <li><a href="/compute/cancel/{{ server.id }}">Cancel</a></li>
       {% endif %}
 #}

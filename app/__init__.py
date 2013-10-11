@@ -15,12 +15,16 @@ class Slick(Flask):
         super(Slick, self).__init__(*args, **kwargs)
         self.left_menu = []
         self.right_menu = []
+        self.widgets = []
 
     def add_menu(self, side, url, label, order=0):
         if 'left' == side:
             self.left_menu.append((url, label, order))
         else:
             self.right_menu.append((url, label, order))
+
+    def add_widget(self, widget):
+        self.widgets.append(widget)
 
 
 # Setup the main Flask app
@@ -60,8 +64,8 @@ def generate_menu():
 # Load pluggable blueprints. This is adapted from code in:
 # https://bitbucket.org/philpem/horizon/
 for name in listdir(BLUEPRINT_PATH):
-    if isdir(join(BLUEPRINT_PATH, name)) and \
-       exists(join(BLUEPRINT_PATH, name, '__init__.py')):
+    if isdir(join(BLUEPRINT_PATH, name)) and exists(join(BLUEPRINT_PATH,
+                                                         name, '__init__.py')):
         module = importlib.import_module('app.blueprints.' + name)
 
         if hasattr(module, 'blueprint'):

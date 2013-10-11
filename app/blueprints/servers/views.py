@@ -4,18 +4,17 @@ from flask import redirect, url_for, flash, request, render_template
 from flask.ext.login import login_required
 from SoftLayer import SoftLayerAPIError
 
-from app import app
-from .manager import (all_servers, get_bmc_create_options, get_server,
+from .manager import (all_servers, get_hourly_create_options, get_server,
                       place_order, verify_order)
-from .forms import CreateBMCForm
+from .forms import CreateHourlyForm
 
 
 @login_required
-def create_bmc():
+def create_hourly():
     # Setup the form choices here since we need access to the client object
     # in order to do so.
-    form = CreateBMCForm()
-    all_options = get_bmc_create_options('')
+    form = CreateHourlyForm()
+    all_options = get_hourly_create_options('')
 
     dc_options = []
     for dc in all_options['locations']:
@@ -30,12 +29,7 @@ def create_bmc():
         entry.choices = _process_category_items(all_options, 'disk0')
 
     if form.validate_on_submit():
-        fields = {}
-        for field in form:
-            if 'csrf_token' == field.name:
-                continue
-
-            fields[field.name] = field.data
+        fields = _extract_fields_from_form(form)
 
         (success, message) = place_order(**fields)
         if success:
@@ -56,11 +50,12 @@ def create_bmc():
     if form.errors:
         flash('There are validation errors with your submission.', 'error')
 
-    return render_template('server_bmc_add.html', title='Order BMC', form=form)
+    return render_template('server_hourly_add.html',
+                           title='Order Hourly Server', form=form)
 
 
 @login_required
-def create_dedicated():
+def create_monthly():
     pass
 
 
@@ -75,26 +70,15 @@ def index():
 
 
 @login_required
-def price_check():
-    form = CreateBMCForm()
+def price_check(server_type):
+    if 'hourly' == server_type:
+        form = CreateHourlyForm()
 
-    fields = {}
-
-    for field in form:
-        if 'csrf_token' == field.name:
-            continue
-
-        if request.form.get(field.name):
-            fields[field.name] = request.form[field.name]
-
-    fields['disks'] = []
-    for key, value in sorted(request.form.items()):
-        if key.startswith('disks-'):
-            fields['disks'].append(value)
+    fields = _extract_fields_from_form(form)
 
     try:
         results = verify_order(**fields)
-        return render_template('server_bmc_price_quote.html',
+        return render_template('server_hourly_price_quote.html',
                                order_template=results)
     except SoftLayerAPIError as e:
         return render_template('server_price_quote_error.html',
@@ -115,6 +99,27 @@ def status(server_id):
     })
 
 
+def _extract_fields_from_form(form):
+    fields = {}
+
+    for field in form:
+        if 'csrf_token' == field.name:
+            continue
+
+        if request.form.get(field.name):
+            fields[field.name] = request.form[field.name]
+
+    fields['disks'] = []
+    for key, value in sorted(request.form.items()):
+        if key.startswith('disks-'):
+            fields['disks'].append(value)
+
+    if fields.get('bare_metal'):
+        fields['hourly'] = True
+
+    return fields
+
+
 def _process_category_items(options, category):
     results = [('', '-- Select --')]
 #    previous_sort = None
@@ -123,6 +128,6 @@ def _process_category_items(options, category):
 #            if previous_sort is not None:
 #                results.append(('', '------'))
 #            previous_sort = item['sort']
-        results.append((item['price_id'], item['description']))
+        results.append((str(item['price_id']), item['description']))
     return results
     

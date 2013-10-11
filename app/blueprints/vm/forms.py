@@ -4,7 +4,7 @@ from wtforms.validators import Required
 from wtformsparsleyjs import TextField, SelectField
 
 
-class CreateCCIForm(Form):
+class CreateVMForm(Form):
     datacenter = SelectField('Data Center')
     hostname = TextField('Hostname', validators=[Required()])
     domain = TextField('Domain', validators=[Required()])

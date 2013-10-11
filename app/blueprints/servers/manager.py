@@ -16,7 +16,7 @@ def all_servers(hw_filter=None):
 
 
 #@memoized
-def get_bmc_create_options(username):
+def get_hourly_create_options(username):
     results = get_hardware_manager().get_bare_metal_create_options()
 
     # Sort locations by their long name

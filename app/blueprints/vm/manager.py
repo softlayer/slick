@@ -5,7 +5,8 @@
 #from slick.utils.memoized import memoized
 from app.utils.core import get_client
 from app.utils.nested_dict import lookup
-from SoftLayer import CCIManager, SoftLayerAPIError
+from SoftLayer import VMManager, SoftLayerAPIError
+
 
 #@memoized
 def all_instance_options(username):
@@ -17,7 +18,7 @@ def all_instance_options(username):
     hit the tool simultaneously.
     """
 
-    all_options = get_cci_manager().get_create_options()
+    all_options = get_vm_manager().get_create_options()
 
     # Prime our results dictionary.
     results = {
@@ -37,7 +38,7 @@ def all_instances(instance_filter):
     """
     instances = []
 
-    for instance in get_cci_manager().list_instances(**instance_filter):
+    for instance in get_vm_manager().list_instances(**instance_filter):
         instances.append(_extract_instance_data(instance))
 
     return instances
@@ -49,7 +50,7 @@ def change_port_speed(instance_id, nic, speed):
         public = False
 
     try:
-        get_cci_manager().change_port_speed(instance_id, public, speed)
+        get_vm_manager().change_port_speed(instance_id, public, speed)
         success = True
         message = "Port speed changed. It may take up to a minute for this " \
                   "to take effect"
@@ -61,13 +62,13 @@ def change_port_speed(instance_id, nic, speed):
 
 
 def cancel_instance(instance_id):
-    """ Wrapper for the CCIManager's cancel_instance() call.
+    """ Wrapper for the VMManager's cancel_instance() call.
 
     :param int instance_id: The ID of the CloudCompute instance to cancel.
     """
 
     try:
-        get_cci_manager().cancel_instance(instance_id)
+        get_vm_manager().cancel_instance(instance_id)
         success = True
         message = 'Cancel instance successful. Please check your email for ' \
                   'more information.'
@@ -78,17 +79,17 @@ def cancel_instance(instance_id):
     return (success, message)
 
 
-def get_cci_manager():
-    return CCIManager(get_client())
+def get_vm_manager():
+    return VMManager(get_client())
 
 
 def get_instance(instance_id, full_data=False):
-    """ Wrapper for the CCIManager's get_instance() call.
+    """ Wrapper for the VMManager's get_instance() call.
 
     :param int instance_id: The ID of the CloudCompute instance to cancel.
     """
     try:
-        instance = get_cci_manager().get_instance(instance_id)
+        instance = get_vm_manager().get_instance(instance_id)
     except SoftLayerAPIError:
         return None
 
@@ -99,15 +100,15 @@ def get_instance(instance_id, full_data=False):
 
 
 def launch_instance(hostname, domain, os, cpus, memory, network, datacenter=''):
-    """ This method wraps the CCIManager's create_instance() call.
+    """ This method wraps the VMManager's create_instance() call.
 
-    :param string datacenter: The datacenter in which to spin up the new CCI.
-    :param string hostname: The hostname for the new CCI.
-    :param string domain: The domain for the new CCI.
-    :param string os: The code for the operating system to load onto the CCI.
-    :param int cpus: The number of CPUs needed for the new CCI.
-    :param int memory: The amount of memory (in MB) for the new CCI.
-    :param int network: The speed (in Mbps) for the new CCI.
+    :param string datacenter: The datacenter in which to spin up the new VM.
+    :param string hostname: The hostname for the new VM.
+    :param string domain: The domain for the new VM.
+    :param string os: The code for the operating system to load onto the VM.
+    :param int cpus: The number of CPUs needed for the new VM.
+    :param int memory: The amount of memory (in MB) for the new VM.
+    :param int network: The speed (in Mbps) for the new VM.
     """
     instance = {
         'datacenter': datacenter,
@@ -120,7 +121,7 @@ def launch_instance(hostname, domain, os, cpus, memory, network, datacenter=''):
     }
 
     try:
-        get_cci_manager().create_instance(**instance)
+        get_vm_manager().create_instance(**instance)
         success = True
         message = 'Create instance successful. Please check your email ' \
                   'for more information.'
@@ -132,7 +133,7 @@ def launch_instance(hostname, domain, os, cpus, memory, network, datacenter=''):
 
 
 def reboot_instance(instance_id, soft=True):
-    """ Provides a single interface function for rebooting a CCI.
+    """ Provides a single interface function for rebooting a VM.
 
     :param int instance_id: The ID of the CloudCompute instance to reboot.
     :param bool soft: Flag to determine if this should be a soft or hard
@@ -154,13 +155,13 @@ def reboot_instance(instance_id, soft=True):
 
 
 def reload_instance(instance_id):
-    """ Wrapper for the CCIManager's reload_instance() call.
+    """ Wrapper for the VMManager's reload_instance() call.
 
     :param int instance_id: The ID of the CloudCompute instance to reload.
     """
 
     try:
-        get_cci_manager().reload_instance(instance_id)
+        get_vm_manager().reload_instance(instance_id)
         success = True
         message = 'Reload request issued. You will receive an email when ' \
                   'the reload is complete.'
@@ -172,18 +173,18 @@ def reload_instance(instance_id):
 
 
 def validate_instance(hostname, domain, os, cpus, memory, network, datacenter=''):
-    """ This method wraps the CCIManager's verify_create_instance() call.
+    """ This method wraps the VMManager's verify_create_instance() call.
 
     Useful if you want to get a price quote or just check the parameters before
     actually placing an order.
 
-    :param string datacenter: The datacenter in which to spin up the new CCI.
-    :param string hostname: The hostname for the new CCI.
-    :param string domain: The domain for the new CCI.
-    :param string os: The code for the operating system to load onto the CCI.
-    :param int cpus: The number of CPUs needed for the new CCI.
-    :param int memory: The amount of memory (in MB) for the new CCI.
-    :param int network: The speed (in Mbps) for the new CCI.
+    :param string datacenter: The datacenter in which to spin up the new VM.
+    :param string hostname: The hostname for the new VM.
+    :param string domain: The domain for the new VM.
+    :param string os: The code for the operating system to load onto the VM.
+    :param int cpus: The number of CPUs needed for the new VM.
+    :param int memory: The amount of memory (in MB) for the new VM.
+    :param int network: The speed (in Mbps) for the new VM.
     :returns: Returns a dict containing the order template for a valid order
     """
     instance = {
@@ -196,7 +197,7 @@ def validate_instance(hostname, domain, os, cpus, memory, network, datacenter=''
         'nic_speed': network
     }
 
-    return get_cci_manager().verify_create_instance(**instance)
+    return get_vm_manager().verify_create_instance(**instance)
 
 
 #########################

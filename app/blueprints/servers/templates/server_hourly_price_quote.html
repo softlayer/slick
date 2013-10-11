@@ -23,11 +23,11 @@
     <tr class="success">
       <td style="border-top: 1px solid #000000;">Estimated Total</td>
       <td style="border-top: 1px solid #000000;">
-        {% set total = 0 %}
+        {% set total = 0.0 %}
         {%- for price in found_prices %}
           {% set total = total + price %}
-          {% if loop.last %}{{ "$%.2f"|format(total) }} *{% endif %}
         {% endfor %}
+        {{ "$%.2f"|format(total) }} *
       </td>
     </tr>
   </tbody>

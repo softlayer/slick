@@ -1,7 +1,7 @@
 {% extends "layout/base.html" %}
 
 {% block content %}
-<form action="{{ url_for('.create_bmc') }}" method="post" id='bmc_add_form' class="form-horizontal" role="form">
+<form action="{{ url_for('.create_hourly') }}" method="post" id='hourly_add_form' class="form-horizontal" role="form">
   {{form.hidden_tag()}}
 
   {# Hostname and Domain #}
@@ -72,12 +72,12 @@
 $('#price_submit').click(function(event) {
     event.preventDefault();
 
-    valid = $('#bmc_add_form').parsley('validate');
+    valid = $('#hourly_add_form').parsley('validate');
     
     if (valid) {
       div = $('#price_div');
       div.html('<img src="/static/img/ajax-loader.gif" alt="Loading Price Quote"> Getting Quote');
-      $.post('{{ url_for('.price_check') }}', $('#bmc_add_form').serialize()).done(function(data) { div.html(data) });
+      $.post('{{ url_for('.price_check', server_type='hourly') }}', $('#hourly_add_form').serialize()).done(function(data) { div.html(data) });
     }
 });
 

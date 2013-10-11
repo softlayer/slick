@@ -5,7 +5,7 @@
 #from slick.utils.memoized import memoized
 from app.utils.core import get_client
 from app.utils.nested_dict import lookup
-from SoftLayer import VMManager, SoftLayerAPIError
+from SoftLayer import CCIManager, SoftLayerAPIError
 
 
 #@memoized
@@ -62,7 +62,7 @@ def change_port_speed(instance_id, nic, speed):
 
 
 def cancel_instance(instance_id):
-    """ Wrapper for the VMManager's cancel_instance() call.
+    """ Wrapper for the CCIManager's cancel_instance() call.
 
     :param int instance_id: The ID of the CloudCompute instance to cancel.
     """
@@ -80,11 +80,11 @@ def cancel_instance(instance_id):
 
 
 def get_vm_manager():
-    return VMManager(get_client())
+    return CCIManager(get_client())
 
 
 def get_instance(instance_id, full_data=False):
-    """ Wrapper for the VMManager's get_instance() call.
+    """ Wrapper for the CCIManager's get_instance() call.
 
     :param int instance_id: The ID of the CloudCompute instance to cancel.
     """
@@ -100,7 +100,7 @@ def get_instance(instance_id, full_data=False):
 
 
 def launch_instance(hostname, domain, os, cpus, memory, network, datacenter=''):
-    """ This method wraps the VMManager's create_instance() call.
+    """ This method wraps the CCIManager's create_instance() call.
 
     :param string datacenter: The datacenter in which to spin up the new VM.
     :param string hostname: The hostname for the new VM.
@@ -155,7 +155,7 @@ def reboot_instance(instance_id, soft=True):
 
 
 def reload_instance(instance_id):
-    """ Wrapper for the VMManager's reload_instance() call.
+    """ Wrapper for the CCIManager's reload_instance() call.
 
     :param int instance_id: The ID of the CloudCompute instance to reload.
     """
@@ -173,7 +173,7 @@ def reload_instance(instance_id):
 
 
 def validate_instance(hostname, domain, os, cpus, memory, network, datacenter=''):
-    """ This method wraps the VMManager's verify_create_instance() call.
+    """ This method wraps the CCIManager's verify_create_instance() call.
 
     Useful if you want to get a price quote or just check the parameters before
     actually placing an order.

@@ -30,7 +30,7 @@
       <li><a href="{{ url_for('.soft_reboot_vm', vm_id=instance.id) }}" id="soft_reboot_{{ instance.id }}" onclick="vmAction({{ instance.id }}, 'soft_reboot'); return false;">Soft Reboot</a></li>
       <li><a href="{{ url_for('.hard_reboot_vm', vm_id=instance.id) }}" id="hard_reboot_{{ instance.id }}" onclick="vmAction({{ instance.id }}, 'hard_reboot'); return false;">Hard Reboot</a></li>
       <li><a href="{{ url_for('.reload_vm', vm_id=instance.id) }}" id="reload_{{ instance.id }}" onclick="vmAction({{ instance.id }}, 'reload'); return false;">Reload</a></li>
-      <li><a href="/compute/cancel/{{ instance.id }}">Cancel</a></li>
+      <li><a href="{{ url_for('.cancel', vm_id=instance.id) }}" id="cancel_{{ instance.id }}" onclick="vmAction({{ instance.id }}, 'cancel'); return false;">Cancel</a></li>
       {% endif %}
     </ul>
   </div>

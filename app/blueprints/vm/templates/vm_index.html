@@ -46,6 +46,10 @@ setInterval(function() {
       var vmId = vmList[i];
       $.get("{{ url_for('vm_module.status') }}/" + vmId).done(function(data) {
           result = $.parseJSON(data);
+          if (!result) {
+            $('#vm_' + vmId).remove();
+            vmList.splice(index, 1);
+          }
           $('#vm_' + vmId).html(result.row_html);
           if (result.active) {
             var index = vmList.indexOf(vmId);
@@ -69,6 +73,8 @@ function vmAction(vmId, action) {
       var message = 'This will attempt to reboot the VM using the normal operating system method.';
     } else if (action == 'hard_reboot') {
       var message = 'This will simulate a power cycle of the VM!';
+    } else if (action == 'cancel') {
+      var message = 'This will immediately cancel the VM, destroying all data on the system!';
     } else {
       var message = 'You are attempting to perform an unknown action.';
     }

@@ -16,6 +16,9 @@ app.add_menu('left', submenu, 'Compute', 1)
 blueprint.add_url_rule('/add', view_func=views.create,
                        methods=['GET', 'POST'])
 
+# VM Cancel
+blueprint.add_url_rule('/cancel/<int:vm_id>', view_func=views.cancel)
+
 # VM List
 blueprint.add_url_rule('/', view_func=views.index)
 blueprint.add_url_rule('/index', view_func=views.index)

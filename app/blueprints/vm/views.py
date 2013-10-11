@@ -8,9 +8,10 @@ from app.utils.core import get_client
 from app.utils.nested_dict import lookup
 from app.blueprints.vm.forms import CreateVMForm
 from app.blueprints.vm.manager import (all_instances, all_instance_options,
-                                        change_port_speed, get_instance,
-                                        reboot_instance, reload_instance,
-                                        launch_instance, validate_instance)
+                                       cancel_instance, change_port_speed,
+                                       get_instance, launch_instance,
+                                       reboot_instance, reload_instance,
+                                       validate_instance)
 
 
 @login_required
@@ -18,12 +19,23 @@ def change_nic_speed(vm_id, nic, speed):
     """ This function will alter the port speed of the specified NIC on the
     VM. It's designed to be called via AJAX.
 
-    :param int instance_id: The ID of the instance to change
+    :param int vm_id: The ID of the instance to change
     :param string nic: The identifier of the network interface to change
     :param int speed: The speed to change the interface to
     """
 
     (success, message) = change_port_speed(vm_id, nic, speed)
+    return json.dumps({'success': success, 'message': message})
+
+
+@login_required
+def cancel(vm_id):
+    """ This function will cancel the specified virtual machine.
+
+    :param int vm_id: The ID of the instance to change
+    """
+
+    (success, message) = cancel_instance(vm_id)
     return json.dumps({'success': success, 'message': message})
 
 
@@ -156,6 +168,9 @@ def status(vm_id):
         return None
 
     instance = get_instance(vm_id)
+    if not instance:
+        return ''
+
     html = render_template('vm_instance_row.html', instance=instance)
 
     return json.dumps({

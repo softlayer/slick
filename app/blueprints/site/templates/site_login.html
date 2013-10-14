@@ -10,14 +10,30 @@
   <form class="form-signin" action="{{ url_for('site_module.login') }}" method="post">
     <h2 class="form-signin-heading">Sign In</h2>
     {{form.hidden_tag()}}
+    <div class="form-group">
     {{form.username(size=80, class="form-control", placeholder="Username", autofocus=true)}}
-    {% for error in form.errors.username %}
-        <span style="color: red;">[{{error}}]</span>
-    {% endfor %}<br>
+    {% if form.errors.username and form.errors.username is iterable %}
+      <span class="help-block">
+        <ul class="list-unstyled">
+          {% for error in form.errors.username %}
+          <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
+      </span>
+    {% endif %}
+    </div>
+    <div class="form-group">
     {{form.password(size=80, class="form-control", placeholder="Password")}}
-    {% for error in form.errors.password %}
-        <span style="color: red;">[{{error}}]</span>
-    {% endfor %}<br>
+    {% if form.errors.password and form.errors.password is iterable %}
+      <span class="help-block">
+        <ul class="list-unstyled">
+          {% for error in form.errors.password %}
+          <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
+      </span>
+    {% endif %}
+    </div>
     <label class="checkbox">
         {{form.remember_me}} Remember Me
     </label>

@@ -1,0 +1,27 @@
+{% extends "layout/base.html" %}
+
+{% block content %}
+{% set special_packages = ['Single Processor Multi-core Servers', 'Dual Processor Multi-core Servers', 'Quad Processor Multi-core Servers'] %}
+
+{% for package in special_packages %}
+    <h4>{{ package }}</h4>
+
+    <ul class="unstyled">
+    {% for id, name in options[package]|sort(attribute=1) %}
+      <li><a href="{{ url_for('.create_monthly', package_id=id) }}">{{ name }}</a></li>
+    {% endfor %}
+    </ul>
+{% endfor %}
+
+{% for category, packages in options.iteritems()|sort %}
+    {% if category not in special_packages %}
+        <h4>{{ category }}</h4>
+
+        <ul class="unstyled">
+        {% for id, name in packages|sort(attribute=1) %}
+          <li><a href=" {{ url_for('.create_monthly', package_id=id) }}">{{ name }}</a></li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+{% endfor %}
+{% endblock %}

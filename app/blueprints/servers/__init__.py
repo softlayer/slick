@@ -16,8 +16,9 @@ app.add_menu('left', submenu, 'Servers', 1)
 # Servers Add
 blueprint.add_url_rule('/add/hourly', view_func=views.create_hourly,
                        methods=['GET', 'POST'])
-blueprint.add_url_rule('/add/monthly', view_func=views.create_monthly,
-                       methods=['GET', 'POST'])
+blueprint.add_url_rule('/add/monthly', view_func=views.create_monthly)
+blueprint.add_url_rule('/add/monthly/<int:package_id>',
+                       view_func=views.create_monthly, methods=['GET', 'POST'])
 
 # Servers List
 blueprint.add_url_rule('/', view_func=views.index)

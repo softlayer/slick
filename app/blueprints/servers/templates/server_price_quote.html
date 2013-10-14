@@ -8,8 +8,11 @@
   <tbody>
     {% set found_prices = [] %}
     {% for item in order_template.prices %}
-      {# TODO - This needs to support hourly vs. monthly #}
-      {% set price_var = 'recurringFee' %}
+      {% if type == 'hourly' %}
+        {% set price_var = 'hourlyRecurringFee' %}
+      {% else %}
+        {% set price_var = 'recurringFee' %}
+      {% endif %}
       {% set price = item.get(price_var, 0)|int %}
 
       {% if price %}

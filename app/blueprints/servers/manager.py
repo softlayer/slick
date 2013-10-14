@@ -1,4 +1,5 @@
 from app.utils.core import get_client
+from app.utils.html import strip_tags
 from app.utils.nested_dict import lookup, multikeysort
 from SoftLayer import HardwareManager, SoftLayerAPIError
 
@@ -16,6 +17,26 @@ def all_servers(hw_filter=None):
 
 
 #@memoized
+def get_available_monthly_server_packages(username=None):
+    packages = get_hardware_manager().get_available_dedicated_server_packages()
+
+    categories = {}
+
+    for package in packages:
+        category = strip_tags(package[2])
+
+        if not category:
+            category = 'General'
+
+        if category not in categories:
+            categories[category] = []
+
+        categories[category].append((package[0], package[1]))
+
+    return categories
+
+
+#@memoized
 def get_hourly_create_options(username):
     results = get_hardware_manager().get_bare_metal_create_options()
 
@@ -24,13 +45,44 @@ def get_hourly_create_options(username):
                                   key=lambda x: x['long_name'])
 
     # Sort items within each category by the sort key, then the capacity key
-    for k, v in results['categories'].iteritems():
+    for k, v in results['categories'].items():
         items = multikeysort(v['items'], ['sort', 'capacity'])
         results['categories'][k]['items'] = items
 
     # Deleting the 'other' category since we don't need it
     if results['categories'].get('other'):
         del(results['categories']['other'])
+    return results
+
+
+#@memoized
+def get_monthly_create_options(username, package_id):
+    mgr = get_hardware_manager()
+    results = mgr.get_dedicated_server_create_options(package_id)
+
+    package = get_client()['Product_Package'].getObject(id=package_id,
+                                                        mask="mask[id,name]")
+    results['package_id'] = package_id
+    results['package_name'] = package['name']
+
+    # Sort locations by their long name
+    results['locations'] = sorted(results['locations'],
+                                  key=lambda x: x['long_name'])
+
+    groups = {}
+
+    # Sort items within each category by the sort key, then the capacity key
+    for k, v in results['categories'].items():
+        group = v['group'] or 'Miscellaneous'
+        if group not in groups:
+            groups[group] = {}
+        items = multikeysort(v['items'], ['sort', 'capacity', 'recurring_fee'])
+        v['items'] = items
+        groups[group][k] = v
+        #results['categories'][k]['items'] = items
+
+    results['groups'] = groups
+
     return results
 
 

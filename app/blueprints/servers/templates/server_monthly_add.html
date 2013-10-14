@@ -1,0 +1,95 @@
+{% extends "layout/base.html" %}
+
+{% block content %}
+<form action="{{ url_for('.create_monthly') }}" method="post" id='monthly_add_form' class="form-horizontal" role="form">
+  {{form.hidden_tag()}}
+
+  <h4>Core System</h4>
+  {# Hostname and Domain #}
+  <div class="form-group">
+    <label for="hostname" class="col-md-2 control-label">Name</label>
+    <div class="col-md-2{% if form.hostname.errors %} has-error{% endif %}">
+      {{form.hostname(class="form-control", autofocus=true, placeholder='Hostname')}}
+      {% if form.hostname.errors and form.hostname.errors is iterable %}
+      <span class="help-block">
+        <ul class="list-unstyled">
+          {% for error in form.hostname.errors %}
+          <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
+      </span>
+      {% endif %}
+    </div>
+    <div class="col-md-2{% if form.domain.errors %} has-error{% endif %}">
+      {{form.domain(class="form-control", placeholder='Domain')}}
+      {% if form.domain.errors and form.domain.errors is iterable %}
+      <span class="help-block">
+        <ul class="list-unstyled">
+          {% for error in form.domain.errors %}
+          <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
+      </span>
+      {% endif %}
+    </div>
+  </div>
+
+  {# Data Center #}
+  {{ helpers.field_enclosure(form.location(class="form-control"), label='Data Center', field_name='location', errors=form.location.errors) }}
+
+  {# CPUs #}
+  {{ helpers.field_enclosure(form.server(class="form-control"), label='CPU', field_name='server', errors=form.server.errors) }}
+
+  {# Memory #}
+  {{ helpers.field_enclosure(form.ram(class="form-control"), label='Memory', field_name='ram', errors=form.ram.errors) }}
+
+  {# Operating System #}
+  {{ helpers.field_enclosure(form.os(class="form-control"), label='Operating System', field_name='os', errors=form.os.errors) }}
+
+  {# NIC Speed #}
+  {{ helpers.field_enclosure(form.port_speed(class="form-control"), label='Network Speed', field_name='port_speed', errors=form.port_speed.errors) }}
+
+  <h4>Disks</h4>
+  {{ helpers.field_enclosure(form.disk_controller(class="form-control"), label='Disk Controller', field_name='disk_controller', errors=form.disk_controller.errors) }}
+
+  {# Disks #}
+  {% set disk_count = 0 %}
+  {% for entry in form.disks.entries %}
+    {{ helpers.field_enclosure(entry(class="form-control"), label='Disk ' + disk_count|string, field_name='disks[]', errors=form.disks.errors) }}
+    {% set disk_count = disk_count + 1 %}
+  {% endfor %}
+
+  <div class="row">
+    <div class="col-md-offset-2 col-md-4" id="price_div"></div>
+  </div>
+
+  {# Submit Buttons #}
+  <div class="form-group">
+    <div class="col-md-offset-2 col-md-10">
+      <button type="submit" class="btn btn-primary">Launch Instance</button>
+      <button type="submit" class="btn btn-success" id="price_submit">Get Price Quote</button>
+      <a href="{{ url_for('.index') }}" class="btn btn-default">Cancel</a>
+    </div>
+  </div>
+</form>
+{% endblock %}
+
+{% block javascript %}
+<script type="text/javascript">
+$('#price_submit').click(function(event) {
+    event.preventDefault();
+
+    valid = $('#monthly_add_form').parsley('validate');
+    
+    if (valid) {
+      div = $('#price_div');
+      div.html('<img src="/static/img/ajax-loader.gif" alt="Loading Price Quote"> Getting Quote');
+      $.post('{{ url_for('.price_check', server_type='monthly') }}', $('#monthly_add_form').serialize()).done(function(data) { div.html(data) });
+    }
+});
+
+$('.form-control').change(function() {
+    $('#price_div').html('');
+});
+</script>
+{% endblock %}

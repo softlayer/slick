@@ -4,7 +4,7 @@ from flask.ext.login import login_user, logout_user, login_required
 
 from SoftLayer import Client, SoftLayerAPIError
 
-from app import db, lm
+from app import app, db, lm
 from app.blueprints.site.forms import LoginForm
 from app.blueprints.site.models import User
 from app.utils.core import get_client
@@ -13,12 +13,13 @@ from app.utils.core import get_client
 @login_required
 def index():
     user = g.user
-    client = get_client()
-    user = client['Account'].getCurrentUser(mask='mask[permissions]')
-#    for perm in user['permissions']:
-#        if 'UPGRADE' in perm['keyName']:
-#            print perm['keyName'],'-',perm['name']
-    return render_template("site_index.html", title='Home', user=user)
+
+    widgets = []
+    for widget in app.widgets:
+        widgets.append(widget)
+
+    return render_template("site_index.html", title='Home', user=user,
+                           widgets=widgets)
 
 
 def login():

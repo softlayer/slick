@@ -262,7 +262,9 @@ def _extract_instance_data(instance):
 
         if not status:
             status = 'Unknown status'
-
+    elif instance['powerState'].get('keyName') == 'HALTED':
+        active = False
+        status = 'Stopped'
     else:
         active = True
         status = 'Running'

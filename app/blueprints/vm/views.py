@@ -163,6 +163,26 @@ def soft_reboot_vm(vm_id):
 
 
 @login_required
+def start_vm(vm_id):
+    vg_client = get_client()['Virtual_Guest']
+    vg_client.powerOn(id=vm_id)
+    return json.dumps({
+        'success': True,
+        'message': 'Instance is being started.'
+    })
+
+
+@login_required
+def stop_vm(vm_id):
+    vg_client = get_client()['Virtual_Guest']
+    vg_client.powerOff(id=vm_id)
+    return json.dumps({
+        'success': True,
+        'message': 'Instance is being stopped.'
+    })
+
+
+@login_required
 def status(vm_id):
     if not vm_id:
         return None

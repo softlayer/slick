@@ -1,16 +1,19 @@
 from flask import Blueprint
 
 blueprint = Blueprint('vm_module', __name__, template_folder='templates',
-                      url_prefix='/vm')
+                      static_folder='static', url_prefix='/vm')
 
 from app import app
-from app.blueprints.vm import views
+from app.blueprints.vm import views, widgets
 
 submenu = [
     ('vm_module.index', 'List Instances'),
     ('vm_module.create', 'Create Instance'),
 ]
 app.add_menu('left', submenu, 'Compute', 1)
+
+for widget in widgets.get_widgets():
+    app.add_widget(widget)
 
 # VM Add
 blueprint.add_url_rule('/add', view_func=views.create,
@@ -39,6 +42,12 @@ blueprint.add_url_rule('/reload/<int:vm_id>', view_func=views.reload_vm)
 # VM Status (AJAX call)
 blueprint.add_url_rule('/status', view_func=views.status)
 blueprint.add_url_rule('/status/<int:vm_id>', view_func=views.status)
+
+# VM Start (AJAX call)
+blueprint.add_url_rule('/start/<int:vm_id>', view_func=views.start_vm)
+
+# VM Stop (AJAX call)
+blueprint.add_url_rule('/stop/<int:vm_id>', view_func=views.stop_vm)
 
 # VM View
 blueprint.add_url_rule('/view/<int:vm_id>', view_func=views.view)

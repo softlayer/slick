@@ -1,0 +1,10 @@
+<div id="vm-widget-bandwidth"></div>
+
+<script type="text/javascript">
+  var vmBandwidthData = [
+  ['Name', 'Outbound', 'Projected'],
+  {% for vm in bandwidth %}
+    ['{{ vm[0] }}', {{ vm[1]}}, {{ vm[2] }}],
+  {% endfor %}
+];
+</script>

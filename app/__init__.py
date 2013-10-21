@@ -63,10 +63,13 @@ def generate_menu():
 
 # Load pluggable blueprints. This is adapted from code in:
 # https://bitbucket.org/philpem/horizon/
+app.config['installed_blueprints'] = []
+
 for name in listdir(BLUEPRINT_PATH):
     if isdir(join(BLUEPRINT_PATH, name)) and exists(join(BLUEPRINT_PATH,
                                                          name, '__init__.py')):
         module = importlib.import_module('app.blueprints.' + name)
 
         if hasattr(module, 'blueprint'):
+            app.config['installed_blueprints'].append(name)
             app.register_blueprint(module.blueprint)

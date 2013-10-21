@@ -19,7 +19,7 @@
     </thead>
     <tbody>
       {% for instance in instances %}
-      {% if not instance.active or not instance.datacenter %}
+      {% if (not instance.active or not instance.datacenter) and instance.status != 'Stopped' %}
         {% do inactive_vms.append(instance.id) %}
       {% endif %}
       <tr id="vm_{{ instance.id }}">{% include 'vm_instance_row.html' %}</tr>
@@ -75,6 +75,8 @@ function vmAction(vmId, action) {
       var message = 'This will simulate a power cycle of the VM!';
     } else if (action == 'cancel') {
       var message = 'This will immediately cancel the VM, destroying all data on the system!';
+    } else if (action == 'stop') {
+      var message = 'This will stop the VM, prevending it from being used.';
     } else {
       var message = 'You are attempting to perform an unknown action.';
     }

@@ -1,7 +1,36 @@
 {% extends "layout/base.html" %}
+{% set javascript_includes = [] %}
 {% block content %}
-<h1>Hi, {{user.username}}!</h1>
-{% for post in posts %}
-<div><p>{{post.author.nickname}} says: <b>{{post.body}}</b></p></div>
+
+<div class="container">
+{% for widget in widgets %}
+{% if widget.javascript %}
+  {% do javascript_includes.append(widget.javascript) %}
+{% endif %}
+{% if widget.status %}
+  {% set panel_class = 'panel-' + widget.status %}
+{% else %}
+  {% set panel_class = 'panel-primary' %}
+{% endif %}
+  <div class="col-md-6">
+    <div class="panel panel-default {{ panel_class }}">
+      {% if widget.title %}
+      <div class="panel-heading">
+        <h3 class="panel-title">{{ widget.title }}</h3>
+      </div>
+      {% endif %}
+      {% if not widget.no_body %}<div class="panel-body">{% endif %}
+        {{ widget.render()|safe }}
+      {% if not widget.no_body %}</div>{% endif %}
+    </div>
+  </div>
+{% endfor %}
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script src="//www.google.com/jsapi"></script>
+{% for js in javascript_includes %}
+  <script src="{{ url_for(js[0], filename=js[1]) }}"></script>
 {% endfor %}
 {% endblock %}

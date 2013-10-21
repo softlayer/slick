@@ -1,0 +1,37 @@
+<table class="table">
+  <thead>
+    <tr><th>Type</th><th>Active</th><th>Transaction</th><th>Down</th><th>Total</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>VM</td>
+      <td class="success">{{ vm.active }}</td>
+      <td class="warning">{{ vm.transaction }}</td>
+      <td class="danger">{{ vm.down }}</td>
+      <td class="info"><a href="{{ url_for('vm_module.index') }}">{{ vm.total }}</a></td>
+    </tr>
+    {% if server %}
+    <tr>
+      <td>Server</td>
+      <td class="success">{{ server.active }}</td>
+      <td class="warning">{{ server.transaction }}</td>
+      <td class="danger">{{ server.down }}</td>
+      <td class="info"><a href="{{ url_for('server_module.index') }}">{{ server.total }}</a></td>
+    </tr>
+    {% endif %}
+  </tbody>
+</table>
+{# 
+<div id="vm-widget-server-status">
+  
+</div>
+
+<script type="text/javascript">
+var serverStatusData = [
+  ['Status', 'Count'],
+  {% for status, count in statuses.items() %}
+    ['{{ status }}', {{ count }}],
+  {% endfor %}
+];
+</script>
+#}

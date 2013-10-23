@@ -2,7 +2,7 @@
 {% set javascript_includes = [] %}
 {% block content %}
 
-<div class="container">
+<div id="widget-container">
 {% for widget in widgets %}
 {% if widget.javascript %}
   {% do javascript_includes.append(widget.javascript) %}
@@ -12,7 +12,7 @@
 {% else %}
   {% set panel_class = 'panel-primary' %}
 {% endif %}
-  <div class="col-md-6">
+  <div class="widget{% if widget.css_class %} {{ widget.css_class }}{% endif %}" id="widget-{{ widget.__class__.__name__ }}">
     <div class="panel panel-default {{ panel_class }}">
       {% if widget.title %}
       <div class="panel-heading">
@@ -29,8 +29,35 @@
 {% endblock %}
 
 {% block javascript %}
+<script src="//cdnjs.cloudflare.com/ajax/libs/packery/1.1.2/packery.pkgd.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/draggabilly/1.0.2/draggabilly.pkgd.js"></script>
 <script src="//www.google.com/jsapi"></script>
 {% for js in javascript_includes %}
   <script src="{{ url_for(js[0], filename=js[1]) }}"></script>
 {% endfor %}
+
+<script type="text/javascript">
+container = $('#widget-container')
+
+container.packery({
+    itemSelector: '.widget',
+    gutter: 10,
+});
+
+pckry = container.data('packery');
+
+var itemElems = pckry.getItemElements();
+for ( var i=0, len = itemElems.length; i < len; i++ ) {
+  var elem = itemElems[i];
+  var draggie = new Draggabilly( elem );
+  pckry.bindDraggabillyEvents( draggie );
+}
+
+pckry.on('layoutComplete', function(pckryInstance, laidOutItems) {
+    for ( var i=0, len = pckryInstance.items.length; i < len; i++ ) {
+      var elem = $(pckryInstance.items[i].element);
+      // Save code goes here
+    }
+});
+</script>
 {% endblock %}

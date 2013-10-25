@@ -15,8 +15,8 @@
   <div class="widget{% if widget.css_class %} {{ widget.css_class }}{% endif %}" id="widget-{{ widget.__class__.__name__ }}">
     <div class="panel panel-default {{ panel_class }}">
       {% if widget.title %}
-      <div class="panel-heading">
-        <h3 class="panel-title">{{ widget.title }}</h3>
+      <div class="panel-heading" style="cursor:move">
+        <h3 class="panel-title"><span class="glyphicon glyphicon-th"></span> {{ widget.title }}</h3>
       </div>
       {% endif %}
       {% if not widget.no_body %}<div class="panel-body">{% endif %}
@@ -40,8 +40,10 @@
 container = $('#widget-container')
 
 container.packery({
+    columnWidth: 10,
+    rowHeight: 10,
     itemSelector: '.widget',
-    gutter: 10,
+    gutter: 5,
 });
 
 pckry = container.data('packery');
@@ -49,9 +51,13 @@ pckry = container.data('packery');
 var itemElems = pckry.getItemElements();
 for ( var i=0, len = itemElems.length; i < len; i++ ) {
   var elem = itemElems[i];
-  var draggie = new Draggabilly( elem );
+  var draggie = new Draggabilly( elem, {handle: '.panel-heading'} );
   pckry.bindDraggabillyEvents( draggie );
 }
+
+imagesLoaded( container, function() {
+    pckry.layout();
+});
 
 pckry.on('layoutComplete', function(pckryInstance, laidOutItems) {
     for ( var i=0, len = pckryInstance.items.length; i < len; i++ ) {

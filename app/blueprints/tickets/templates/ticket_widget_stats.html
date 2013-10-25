@@ -1,0 +1,14 @@
+<div id="ticket-widget-stats" style="height: 250px"></div>
+
+<script type="text/javascript">
+  var ticketStatsData = [
+  ['Category', 'Count'],
+  {% for category in tickets.open %}
+    {% if 'total' != category %}
+      ['{{ category }}', {{ tickets.open[category] }}],
+    {% endif %}
+  {% endfor %}
+];
+
+  var ticketTotal = {{ tickets.open.total }};
+</script>

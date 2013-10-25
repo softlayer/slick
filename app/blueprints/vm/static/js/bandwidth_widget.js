@@ -8,7 +8,7 @@ function drawChart() {
     var options = {
 //	title: 'VM Bandwidth',
 //	width:450,
-	height:225,
+//	height:225,
 	hAxis: {title: 'Data Transferred (GB)'},
 	chartArea: {top: 0, height: '80%'},
 	legend: {position: 'bottom'},

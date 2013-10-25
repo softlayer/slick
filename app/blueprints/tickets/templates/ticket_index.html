@@ -32,3 +32,11 @@
 {% endif %}
 
 {% endblock %}
+
+{% block javascript %}
+<script type="text/javascript">
+$(document).ready(function() {
+    $('#ticket_table').dataTable();
+});
+</script>
+{% endblock %}

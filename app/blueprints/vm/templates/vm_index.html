@@ -100,7 +100,8 @@ function vmAction(vmId, action) {
 }
 
 $(document).ready(function() {
-    $('#vm_table').dataTable();
+    var oTable = $('#vm_table').dataTable();
+    oTable.fnFilter('{{ search }}');
 });
 </script>
 {% endblock %}

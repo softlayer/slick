@@ -1,0 +1,49 @@
+{% extends "layout/base.html" %}
+
+{% block content %}
+{% if subnets %}
+<div class="table-responsive">
+  <table class="table table-striped table-bordered" id="subnet_table">
+    <thead>
+      <tr>
+        <th>Identifier</th>
+        <th>Type</th>
+        <th>Datacenter</th>
+        <th>VLAN Number</th>
+        <th>IPs</th>
+        <th>VMs</th>
+        <th>Servers</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for subnet in subnets %}
+      <tr>
+        <td>{{ subnet.networkIdentifier }}</td>
+        <td>{{ subnet.subnetType }}</td>
+        <td>{{ subnet.datacenter.name }}</td>
+        <td>{{ subnet.networkVlan.vlanNumber }}</td>
+        <td>{{ subnet.ipAddressCount }}</td>
+        <td>{{ subnet.virtualGuests|count }}</td>
+        <td>{{ subnet.hardware|count }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="panel panel-danger">
+  <div class="panel-heading">Error</div>
+  <div class="panel-body">No subnets found on your account.</div>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block javascript %}
+<script type="text/javascript">
+$(document).ready(function() {
+    var oTable = $('#subnet_table').dataTable();
+    oTable.fnFilter('{{ search }}');
+});
+</script>
+{% endblock %}

@@ -48,7 +48,7 @@ class BandwidthWidget(object):
 
 class ServerStatusWidget(object):
     def __init__(self, data):
-        self.css_class = 'col-md-4'
+        self.css_class = 'col-md-6'
         self.data = data
         self.no_body = True
         self.title = 'System Overview'

@@ -1,4 +1,4 @@
-from flask import redirect, url_for, flash, request, render_template
+from flask import render_template
 from flask.ext.login import login_required
 
 from app.utils.core import get_client

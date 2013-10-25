@@ -140,6 +140,13 @@ def index():
     payload['title'] = 'List Servers'
     payload['servers'] = servers
 
+    search = ''
+
+    if request.args.get('dc'):
+        search = request.args.get('dc')
+
+    payload['search'] = search
+
     return render_template("server_index.html", **payload)
 
 

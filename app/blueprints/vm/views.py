@@ -130,6 +130,13 @@ def index():
     payload['instances'] = instances
     payload['total_items'] = total_vms
 
+    search = ''
+
+    if request.args.get('dc'):
+        search = request.args.get('dc')
+
+    payload['search'] = search
+
     return render_template("vm_index.html", **payload)
 
 

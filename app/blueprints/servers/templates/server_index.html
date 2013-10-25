@@ -90,7 +90,8 @@ function serverAction(serverId, action) {
 }
 
 $(document).ready(function() {
-    $('#server_table').dataTable();
+    var oTable = $('#server_table').dataTable();
+    oTable.fnFilter('{{ search }}');
 });
 </script>
 {% endblock %}

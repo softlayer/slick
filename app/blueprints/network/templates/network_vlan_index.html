@@ -1,0 +1,51 @@
+{% extends "layout/base.html" %}
+
+{% block content %}
+{% if vlans %}
+<div class="table-responsive">
+  <table class="table table-striped table-bordered" id="vlan_table">
+    <thead>
+      <tr>
+        <th>Number</th>
+        <th>Datacenter</th>
+        <th>IPs</th>
+        <th>Servers</th>
+        <th>VMs</th>
+        <th>Networking</th>
+        <th>Firewall</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for vlan in vlans %}
+      <tr>
+        <td>{{ vlan.vlanNumber }}</td>
+        <td>{{ vlan.primaryRouter.datacenter.name }}</td>
+        <td>{{ vlan.totalPrimaryIpAddressCount }}</td>
+        <td>{{ vlan.hardware|count }}</td>
+        <td>{{ vlan.virtualGuests|count }}</td>
+        <td>{{ vlan.networkComponents|count }}</td>
+        <td>
+          {% if vlan.firewallInterfaces %}Yes{% else %}No{% endif %}</td>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="panel panel-danger">
+  <div class="panel-heading">Error</div>
+  <div class="panel-body">No VLANs found on your account.</div>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block javascript %}
+<script type="text/javascript">
+$(document).ready(function() {
+    var oTable = $('#vlan_table').dataTable();
+    oTable.fnFilter('{{ search }}');
+});
+</script>
+{% endblock %}

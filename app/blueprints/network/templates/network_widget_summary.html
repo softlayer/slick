@@ -1,0 +1,18 @@
+<table class="table table-striped">
+  <thead>
+    <tr><th>Datacenter</th><th>VLANs</th><th>Subnets</th><th>IPs</th><th>Networking</th><th>Servers</th><th>VMs</th></tr>
+  </thead>
+  <tbody>
+    {% for dc, data in stats.items()|sort() %}
+    <tr>
+      <td>{{ dc }}</td>
+      <td><a href="{{ url_for('network_module.vlan_index') }}?dc={{ dc }}">{{ data.vlanCount }}</a></td>
+      <td><a href="{{ url_for('network_module.subnet_index') }}?dc={{ dc }}">{{ data.subnetCount }}</a></td>
+      <td>{{ data.primaryIpCount }}</td>
+      <td>{{ data.networkingCount }}</td>
+      <td><a href="{{ url_for('server_module.index') }}?dc={{ dc }}">{{ data.hardwareCount }}</a></td>
+      <td><a href="{{ url_for('vm_module.index') }}?dc={{ dc }}">{{ data.virtualGuestCount }}</a></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>

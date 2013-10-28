@@ -36,6 +36,23 @@ def get_available_monthly_server_packages(username=None):
     return categories
 
 
+def change_port_speed(hw_id, nic, speed):
+    public = True
+    if 'eth0' == nic:
+        public = False
+
+    try:
+        get_hardware_manager().change_port_speed(hw_id, public, speed)
+        success = True
+        message = "Port speed changed. It may take up to a minute for this " \
+                  "to take effect"
+    except SoftLayerAPIError as exception:
+        success = False
+        message = str(exception)
+
+    return (success, message)
+
+
 #@memoized
 def get_hourly_create_options(username):
     results = get_hardware_manager().get_bare_metal_create_options()

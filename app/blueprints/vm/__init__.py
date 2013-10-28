@@ -51,8 +51,8 @@ blueprint.add_url_rule('/stop/<int:vm_id>', view_func=views.stop_vm)
 
 # VM View
 blueprint.add_url_rule('/view/<int:vm_id>', view_func=views.view)
-blueprint.add_url_rule('/changeSpeed/<int:vm_id>/<string:nic>/<int:speed>',
+blueprint.add_url_rule('/changeSpeed/<int:object_id>/<string:nic>/<int:speed>',
                        view_func=views.change_nic_speed)
 blueprint.add_url_rule('/getPassword/', view_func=views.get_password)
-blueprint.add_url_rule('/getPassword/<int:vm_id>/<string:username>',
+blueprint.add_url_rule('/getPassword/<int:object_id>/<string:username>',
                        view_func=views.get_password)

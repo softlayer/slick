@@ -13,6 +13,7 @@
         <th>IPs</th>
         <th>VMs</th>
         <th>Servers</th>
+        <th>Actions</th>
       </tr>
     </thead>
     <tbody>
@@ -21,10 +22,20 @@
         <td>{{ subnet.networkIdentifier }}</td>
         <td>{{ subnet.subnetType }}</td>
         <td>{{ subnet.datacenter.name }}</td>
-        <td>{{ subnet.networkVlan.vlanNumber }}</td>
+        <td><a href="{{ url_for('network_module.vlan_index') }}?vlan={{ subnet.networkVlan.vlanNumber }}">{{ subnet.networkVlan.vlanNumber }}</a></td>
         <td>{{ subnet.ipAddressCount }}</td>
         <td>{{ subnet.virtualGuests|count }}</td>
         <td>{{ subnet.hardware|count }}</td>
+        <td>
+          <div class="btn-group">
+            <button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown">
+            Action <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+              <li><a href="{{ url_for('.subnet_view', subnet_id=subnet.id) }}">View</a></li>
+            </ul>
+          </div>
+        </td>
       </tr>
       {% endfor %}
     </tbody>
@@ -42,7 +53,11 @@
 {% block javascript %}
 <script type="text/javascript">
 $(document).ready(function() {
-    var oTable = $('#subnet_table').dataTable();
+    var oTable = $('#subnet_table').dataTable({
+        "aoColumnDefs": [
+          { "bSortable": false, "aTargets": [7] }
+        ],
+      });
     oTable.fnFilter('{{ search }}');
 });
 </script>

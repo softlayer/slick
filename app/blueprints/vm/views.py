@@ -15,16 +15,16 @@ from app.blueprints.vm.manager import (all_instances, all_instance_options,
 
 
 @login_required
-def change_nic_speed(vm_id, nic, speed):
+def change_nic_speed(object_id, nic, speed):
     """ This function will alter the port speed of the specified NIC on the
     VM. It's designed to be called via AJAX.
 
-    :param int vm_id: The ID of the instance to change
+    :param int object_id: The ID of the instance to change
     :param string nic: The identifier of the network interface to change
     :param int speed: The speed to change the interface to
     """
 
-    (success, message) = change_port_speed(vm_id, nic, speed)
+    (success, message) = change_port_speed(object_id, nic, speed)
     return json.dumps({'success': success, 'message': message})
 
 
@@ -90,15 +90,15 @@ def create():
 
 
 @login_required
-def get_password(vm_id, username):
+def get_password(object_id, username):
     """ This function is called via AJAX to retrieve the root/admin password
     for the specified machine and account.
 
-    :param int vm_id: The VM ID to retrieve the password for.
+    :param int object_id: The VM ID to retrieve the password for.
     :param string username: The specific admin account that owns the password.
     """
 
-    instance = get_instance(vm_id, True)
+    instance = get_instance(object_id, True)
 
     if not instance:
         return 'Invalid account'
@@ -216,4 +216,4 @@ def view(vm_id):
     payload['object'] = instance
     payload['module'] = 'vm_module'
 
-    return render_template('vm_view.html', **payload)
+    return render_template('shared/object_view.html', **payload)

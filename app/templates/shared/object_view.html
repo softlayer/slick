@@ -61,9 +61,9 @@
           NIC {{ netname }} - 
           {% if netname in ['eth0', 'eth1'] %}
             {% if 'ACTIVE' == net.status %}
-              <a id="port_{{ object.id }}_{{ netname }}_0" href="{{ url_for(module + '.change_nic_speed', vm_id=object.id, nic=netname, speed=0) }}" class="btn btn-xs btn-default" onclick="disablePort({{ object.id }}, '{{ netname }}'); return false;">Active</a>
+              <a id="port_{{ object.id }}_{{ netname }}_0" href="{{ url_for(module + '.change_nic_speed', object_id=object.id, nic=netname, speed=0) }}" class="btn btn-xs btn-default" onclick="disablePort({{ object.id }}, '{{ netname }}'); return false;">Active</a>
             {% else %}
-              <a id="port_{{ object.id }}_{{ netname }}_{{ net.maxSpeed }}" href="{{ url_for(module + '.change_nic_speed', vm_id=object.id, nic=netname, speed=net.maxSpeed) }}" class="btn btn-xs btn-default" onclick="changeSpeed({{ object.id }}, '{{ netname }}', {{ net.maxSpeed }}); return false;">Disabled</a>
+              <a id="port_{{ object.id }}_{{ netname }}_{{ net.maxSpeed }}" href="{{ url_for(module + '.change_nic_speed', object_id=object.id, nic=netname, speed=net.maxSpeed) }}" class="btn btn-xs btn-default" onclick="changeSpeed({{ object.id }}, '{{ netname }}', {{ net.maxSpeed }}); return false;">Disabled</a>
             {% endif %}
           {% else %}
               <span class="{% if 'ACTIVE' == net.status %}text-success{% else %}text-error{% endif %}"><strong>{{ net.status }}</strong></span>
@@ -77,7 +77,7 @@
             {% if netname in ['eth0', 'eth1'] %}
               <div class="btn-group btn-group-xs">
               {% for speed, label in [(10, '10Mb'), (100, '100 Mb'), (1000, '1 Gb'), (10000, '10 Gb')] %}
-                {% if speed <= net.maxSpeed %}<a id="port_{{ object.id }}_{{ netname }}_{{ speed }}" href="{{ url_for(module + '.change_nic_speed', vm_id=object.id, nic=netname, speed=speed) }}" class="btn {% if speed == net.speed %}btn-primary{% else %}btn-default{% endif %}" onclick="changeSpeed({{ object.id }}, '{{ netname }}', {{ speed }}); return false;">{{ label }}</a>{% endif %}
+                {% if speed <= net.maxSpeed %}<a id="port_{{ object.id }}_{{ netname }}_{{ speed }}" href="{{ url_for(module + '.change_nic_speed', object_id=object.id, nic=netname, speed=speed) }}" class="btn {% if speed == net.speed %}btn-primary{% else %}btn-default{% endif %}" onclick="changeSpeed({{ object.id }}, '{{ netname }}', {{ speed }}); return false;">{{ label }}</a>{% endif %}
               {% endfor %}
               </div>
             {% else %}

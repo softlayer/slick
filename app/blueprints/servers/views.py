@@ -6,10 +6,25 @@ from SoftLayer import SoftLayerAPIError
 from wtformsparsleyjs import SelectField
 from wtforms.validators import Required
 
+from app.utils.nested_dict import lookup
 from .manager import (all_servers, get_hourly_create_options, get_server,
                       place_order, verify_order, get_monthly_create_options,
                       get_available_monthly_server_packages)
 from .forms import CreateHourlyForm, CreateMonthlyForm
+
+
+@login_required
+def change_nic_speed(object_id, nic, speed):
+    """ This function will alter the port speed of the specified NIC on the
+    server. It's designed to be called via AJAX.
+
+    :param int object_id: The ID of the instance to change
+    :param string nic: The identifier of the network interface to change
+    :param int speed: The speed to change the interface to
+    """
+
+    (success, message) = change_port_speed(object_id, nic, speed)
+    return json.dumps({'success': success, 'message': message})
 
 
 @login_required
@@ -134,6 +149,29 @@ def create_monthly(package_id=None):
 
 
 @login_required
+def get_password(object_id, username):
+    """ This function is called via AJAX to retrieve the root/admin password
+    for the specified machine and account.
+
+    :param int object_id: The server ID to retrieve the password for.
+    :param string username: The specific admin account that owns the password.
+    """
+
+    server = get_server(object_id, True)
+
+    if not server:
+        return 'Invalid account'
+
+    password = 'Password not found'
+
+    for account in lookup(server, 'operatingSystem', 'passwords'):
+        if username == account['username']:
+            password = account['password']
+
+    return password
+
+
+@login_required
 def index():
     servers = all_servers()
     payload = {}
@@ -180,6 +218,19 @@ def status(server_id):
         'active': server['active'],
         'row_html': html,
     })
+
+
+@login_required
+def view(server_id):
+    server = get_server(server_id)
+
+    payload = {}
+    payload['title'] = 'View Server'
+    payload['subheader'] = server['fqdn']
+    payload['object'] = server
+    payload['module'] = 'server_module'
+
+    return render_template('shared/object_view.html', **payload)
 
 
 def _extract_fields_from_form(form):

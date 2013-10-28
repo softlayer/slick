@@ -18,5 +18,9 @@ for widget in widgets.get_widgets():
 # Subnet List
 blueprint.add_url_rule('/subnet', view_func=views.subnet_index)
 
+# Subnet View
+blueprint.add_url_rule('/subnet/view/<int:subnet_id>',
+                       view_func=views.subnet_view)
+
 # VLAN List
 blueprint.add_url_rule('/vlan', view_func=views.vlan_index)

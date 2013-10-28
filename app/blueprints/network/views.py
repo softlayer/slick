@@ -26,10 +26,22 @@ def subnet_index():
 
     if request.args.get('dc'):
         search = request.args.get('dc')
-
     payload['search'] = search
 
     return render_template("network_subnet_index.html", **payload)
+
+
+@login_required
+def subnet_view(subnet_id):
+    mgr = NetworkManager(get_client())
+    subnet = mgr.get_subnet(subnet_id)
+
+    payload = {}
+    payload['title'] = "View Subnet"
+    payload['subheader'] = subnet['networkIdentifier']
+    payload['subnet'] = subnet
+
+    return render_template("network_subnet_view.html", **payload)
 
 
 @login_required
@@ -44,6 +56,8 @@ def vlan_index():
 
     if request.args.get('dc'):
         search = request.args.get('dc')
+    elif request.args.get('vlan'):
+        search = request.args.get('vlan')
 
     payload['search'] = search
 

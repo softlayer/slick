@@ -1,0 +1,163 @@
+{% extends "layout/base.html" %}
+
+{% block content %}
+<div class="container">
+  <div class="panel panel-primary">
+    <div class="panel-heading">
+      <h3 class="panel-title">Details</h3>
+    </div>
+    <div class="panel-body">
+      <div class="col-md-6">
+        <label class="col-md-4">Datacenter</label>
+        <div class="col-md-8">
+          <span>{{ vlan.primaryRouter.datacenter.name }}</span>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <label class="col-md-4">Primary Router</label>
+        <div class="col-md-8">
+          <span class="form-control-static">{{ vlan.primaryRouter.fullyQualifiedDomainName }}</span>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <label class="col-md-4">Firewall</label>
+        <div class="col-md-8">
+          <span class="form-control-static">{% if vlan.firewallInterfaces %}Yes{% else %}No{% endif %}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if vlan.subnets %}
+<div class="container">
+  <h3>Subnets</h3>
+  <table class="table" id="subnet_table">
+    <thead>
+      <tr>
+        <th>Identifier</th>
+        <th>Gateway</th>
+        <th>Netmask</th>
+        <th>Type</th>
+        <th>Usable IPs</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for subnet in vlan.subnets %}
+      <tr>
+        <td>{{ subnet.networkIdentifier }}</td>
+        <td>{{ subnet.gateway }}</td>
+        <td>{{ subnet.netmask }}</td>
+        <td>{{ subnet.subnetType }}</td>
+        <td>{{ subnet.usableIpAddressCount }}</td>
+        <td>
+          <a href="{{ url_for('.subnet_view', subnet_id=subnet.id) }}" class="btn btn-primary btn-xs">View</a>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+{% if vlan.virtualGuests %}
+<div class="container">
+  <h3>Virtual Machines</h3>
+  <table class="table" id="vm_table">
+    <thead>
+      <tr>
+        <th>Hostname</th>
+        <th>Domain</th>
+        <th>IP</th>
+        {% if 'vm' in config.installed_blueprints %}
+        <th>Actions</th>
+        {% endif %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for vm in vlan.virtualGuests|sort(attribute='hostname') %}
+      <tr>
+        <td>{{ vm.hostname }}</td>
+        <td>{{ vm.domain }}</td>
+        <td>{{ vm.primaryIpAddress }}</td>
+        {% if 'vm' in config.installed_blueprints %}
+        <td><a href="{{ url_for('vm_module.view', vm_id=vm.id) }}" class="btn btn-primary btn-xs">View</a></td>
+        {% endif %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+{% if vlan.hardware %}
+<div class="container">
+  <h3>Servers</h3>
+  <table class="table" id="server_table">
+    <thead>
+      <tr>
+        <th>Hostname</th>
+        <th>Domain</th>
+        <th>IP</th>
+        {% if 'servers' in config.installed_blueprints %}
+        <th>Actions</th>
+        {% endif %}
+      </tr>
+    </thead>
+    <tbody>
+    {% for server in vlan.hardware|sort(attribute='hostname') %}
+      <tr>
+        <td>{{ server.hostname }}</td>
+        <td>{{ server.domain }}</td>
+        <td>{{ server.primaryIpAddress }}</td>
+        {% if 'servers' in config.installed_blueprints %}
+        <td><a href="{{ url_for('server_module.view', server_id=server.id) }}" class="btn btn-primary btn-xs">View</a></td>
+        {% endif %}
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block javascript %}
+<script type="text/javascript">
+$(document).ready(function() {
+    {% if vlan.subnets %}
+      var subnetConfig = {
+        "aoColumnDefs": [
+          { "bSortable": false, "aTargets": [3] }
+        ],
+      };
+    $('#subnet_table').dataTable(subnetConfig);
+    {% endif %}
+    {% if vlan.virtualGuests %}
+      {% if 'vm' in config.installed_blueprints %}
+        var vmConfig = {
+          "aoColumnDefs": [
+            { "bSortable": false, "aTargets": [3] }
+          ],
+        };
+      {% else %}
+        var vmConfig = {};
+      {% endif %}
+    $('#vm_table').dataTable(vmConfig);
+    {% endif %}
+    {% if vlan.hardware %}
+      {% if 'servers' in config.installed_blueprints %}
+        var serverConfig = {
+          "aoColumnDefs": [
+            { "bSortable": false, "aTargets": [3] }
+          ],
+        };
+      {% else %}
+        var serverConfig = {};
+      {% endif %}
+    $('#server_table').dataTable(serverConfig);
+    {% endif %}
+});
+</script>
+{% endblock %}

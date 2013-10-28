@@ -1,6 +1,7 @@
 {% extends "layout/base.html" %}
 
 {% block content %}
+{#
 <div class="container">
     <div class="col-md-6">
       <div class="panel panel-primary">
@@ -24,7 +25,46 @@
       </div>
     </div>
 </div>
-
+#}
+<div class="container">
+  <div class="panel panel-primary">
+    <div class="panel-heading">
+      <h3 class="panel-title">Details</h3>
+    </div>
+    <div class="panel-body">
+      <div class="col-md-6">
+        <label class="col-md-4">Subnet Type</label>
+        <div class="col-md-8">
+          <span>{{ subnet.networkIdentifier }}</span>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <label class="col-md-4">Datacenter</label>
+        <div class="col-md-8">
+          <span>{{ subnet.datacenter.name }}</span>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <label class="col-md-4">Gateway</label>
+        <div class="col-md-8">
+          <span class="form-control-static">{{ subnet.gateway }}</span>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <label class="col-md-4">Broadcast</label>
+        <div class="col-md-8">
+          <span class="form-control-static">{{ subnet.broadcastAddress }}</span>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <label class="col-md-4">Usable IPs</label>
+        <div class="col-md-8">
+          <span class="form-control-static">{{ subnet.usableIpAddressCount }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 {#
 <div class="container">
 {% if subnet.virtualGuests %}

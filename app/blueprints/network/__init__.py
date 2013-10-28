@@ -24,3 +24,7 @@ blueprint.add_url_rule('/subnet/view/<int:subnet_id>',
 
 # VLAN List
 blueprint.add_url_rule('/vlan', view_func=views.vlan_index)
+
+# VLAN View
+blueprint.add_url_rule('/vlan/view/<int:vlan_id>',
+                       view_func=views.vlan_view)

@@ -62,3 +62,16 @@ def vlan_index():
     payload['search'] = search
 
     return render_template("network_vlan_index.html", **payload)
+
+
+@login_required
+def vlan_view(vlan_id):
+    mgr = NetworkManager(get_client())
+    vlan = mgr.get_vlan(vlan_id)
+
+    payload = {}
+    payload['title'] = "View VLAN"
+    payload['subheader'] = 'VLAN ' + str(vlan['vlanNumber'])
+    payload['vlan'] = vlan
+
+    return render_template("network_vlan_view.html", **payload)

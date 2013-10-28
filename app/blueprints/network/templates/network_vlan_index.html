@@ -13,6 +13,7 @@
         <th>VMs</th>
         <th>Networking</th>
         <th>Firewall</th>
+        <th>Actions</th>
       </tr>
     </thead>
     <tbody>
@@ -26,6 +27,9 @@
         <td>{{ vlan.networkComponents|count }}</td>
         <td>
           {% if vlan.firewallInterfaces %}Yes{% else %}No{% endif %}</td>
+        </td>
+        <td>
+          <a href="{{ url_for('.vlan_view', vlan_id=vlan.id) }}" class="btn btn-primary btn-xs">View</a>
         </td>
       </tr>
       {% endfor %}

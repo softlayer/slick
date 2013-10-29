@@ -15,6 +15,14 @@ app.add_menu('left', submenu, 'Networking', 3)
 for widget in widgets.get_widgets():
     app.add_widget(widget)
 
+# Subnet Cancel
+blueprint.add_url_rule('/subnet/cancel/<int:subnet_id>',
+                       view_func=views.subnet_cancel)
+
+# Subnet Create
+blueprint.add_url_rule('/subnet/create/<int:vlan_id>',
+                       view_func=views.subnet_create, methods=['GET', 'POST'])
+
 # Subnet List
 blueprint.add_url_rule('/subnet', view_func=views.subnet_index)
 

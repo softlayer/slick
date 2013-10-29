@@ -8,6 +8,7 @@
       <tr>
         <th>Number</th>
         <th>Datacenter</th>
+        <th>Subnets</th>
         <th>IPs</th>
         <th>Servers</th>
         <th>VMs</th>
@@ -21,6 +22,7 @@
       <tr>
         <td>{{ vlan.vlanNumber }}</td>
         <td>{{ vlan.primaryRouter.datacenter.name }}</td>
+        <td><a href="{{ url_for('.subnet_index') }}?vlan={{ vlan.vlanNumber }}">{{ vlan.subnets|count }}</a></td>
         <td>{{ vlan.totalPrimaryIpAddressCount }}</td>
         <td>{{ vlan.hardware|count }}</td>
         <td>{{ vlan.virtualGuests|count }}</td>
@@ -29,7 +31,16 @@
           {% if vlan.firewallInterfaces %}Yes{% else %}No{% endif %}</td>
         </td>
         <td>
-          <a href="{{ url_for('.vlan_view', vlan_id=vlan.id) }}" class="btn btn-primary btn-xs">View</a>
+          <div class="btn-group">
+            <button type="button" class="btn btn-primary btn-xs dropdown-toggle" data-toggle="dropdown">
+            Action <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+              <li><a href="{{ url_for('.subnet_create', vlan_id=vlan.id) }}">Create Subnet</a></li>
+              <li><a href="{{ url_for('.vlan_view', vlan_id=vlan.id) }}">View</a></li>
+            </ul>
+          </div>
+          
         </td>
       </tr>
       {% endfor %}

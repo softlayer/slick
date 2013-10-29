@@ -28,10 +28,11 @@
         <td>{{ subnet.hardware|count }}</td>
         <td>
           <div class="btn-group">
-            <button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown">
+            <button type="button" class="btn btn-primary btn-xs dropdown-toggle" data-toggle="dropdown">
             Action <span class="caret"></span>
             </button>
             <ul class="dropdown-menu">
+              <li><a href="{{ url_for('.subnet_cancel', subnet_id=subnet.id) }}" data-confirm="This will cancel this subnet! Are you sure you want to continue?">Cancel</a></li>
               <li><a href="{{ url_for('.subnet_view', subnet_id=subnet.id) }}">View</a></li>
             </ul>
           </div>

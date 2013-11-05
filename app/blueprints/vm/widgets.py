@@ -12,7 +12,7 @@ def get_widgets():
 
 class BandwidthWidget(object):
     def __init__(self, data):
-        self.css_class = 'col-md-6'
+        self.css_class = 'col-md-4'
         self.data = data
         self.javascript = ('vm_module.static', 'js/bandwidth_widget.js')
         self.title = 'Top 10 Devices by Data Transferred'
@@ -48,7 +48,7 @@ class BandwidthWidget(object):
 
 class ServerStatusWidget(object):
     def __init__(self, data):
-        self.css_class = 'col-md-6'
+        self.css_class = 'col-md-4'
         self.data = data
         self.no_body = True
         self.title = 'System Overview'

@@ -1,0 +1,18 @@
+<table class="table table-striped">
+  <thead>
+    <tr><th>Name</th><th>Status</th>
+  </thead>
+  <tbody>
+    {% for account in accounts|sort(attribute='name') %}
+    {% if account.nodes %}
+    <tr>
+{# - Removing temporarily until I can tweak the auth system to work with message queue.
+      <td><a href="{{ url_for('mq_module.queue_list', account_id=account.nodes.0.accountName) }}">{{ account.name }}</a></td>
+#}
+      <td>{{ account.name }}</td>
+      <td>{{ account.status.name }}</td>
+    </tr>
+    {% endif %}
+    {% endfor %}
+  </tbody>
+</table>

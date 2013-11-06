@@ -1,0 +1,18 @@
+{% extends "layout/base.html" %}
+
+{% block content %}
+<form action="{{ url_for('.two_factor_login') }}" method="post" id='site_two_factor_form' class="form-horizontal" role="form">
+  {{form.hidden_tag()}}
+
+  <p>Your account requires a second level of authentication to complete login. A passcode has been sent to the phone number configured on your account. Please enter it to continue.</p>
+
+  {{ helpers.field_enclosure(form.passcode(class="form-control"), label='Passcode', field_name='passcode', errors=form.passcode.errors) }}
+
+  {# Submit Buttons #}
+  <div class="form-group">
+    <div class="col-md-offset-2 col-md-10">
+      <button type="submit" class="btn btn-primary">Sign In</button>
+    </div>
+  </div>
+</form>
+{% endblock %}

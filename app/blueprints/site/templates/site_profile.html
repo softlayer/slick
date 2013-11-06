@@ -1,0 +1,36 @@
+{% extends "layout/base.html" %}
+
+{% block content %}
+<form action="{{ url_for('.profile') }}" method="post" id='site_profile_form' class="form-horizontal" role="form">
+  {{form.hidden_tag()}}
+
+  <div class="form-group">
+    <label for="use_two_factor" class="col-md-2 control-label">Use Two-Factor Auth</label>
+    <div class="col-md-4{% if form.use_two_factor.errors %} has-error{% endif %}">
+      {% for option in form.use_two_factor %}
+        <label class="radio-inline">
+          <input type="radio" name="{{ option.name }}" id="{{ option.id }}" value="{{ option.data }}"{% if option.checked %} checked{% endif %}> {{ option.label }}
+        </label>
+      {% endfor %}
+      {% if form.use_two_factor.errors and form.use_two_factor.errors is iterable %}
+      <span class="help-block">
+        <ul class="list-unstyled">
+          {% for error in form.use_two_factor.errors %}
+          <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
+      </span>
+      {% endif %}
+    </div>
+  </div>
+  {{ helpers.field_enclosure(form.phone_number(class="form-control"), label='Phone Number', field_name='phone_number', errors=form.phone_number.errors) }}
+
+  {# Submit Buttons #}
+  <div class="form-group">
+    <div class="col-md-offset-2 col-md-10">
+      <button type="submit" class="btn btn-primary">Update Profile</button>
+      <a href="{{ url_for('.index') }}" class="btn btn-default">Cancel</a>
+    </div>
+  </div>
+</form>
+{% endblock %}

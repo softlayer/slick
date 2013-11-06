@@ -7,6 +7,13 @@ from flask.ext.login import LoginManager, current_user
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask_debugtoolbar import DebugToolbarExtension
 
+twilio_enabled = True
+try:
+    from twilio import TwilioRestException
+    from twilio.rest import TwilioRestClient
+except ImportError:
+    twilio_enabled = False
+
 
 # We're going to extend the base Flask functionality to provide a central
 # menu system.
@@ -33,6 +40,16 @@ app.config.from_object('config')
 app.static_folder = join(dirname(abspath(__file__)), "static")
 app.static_url_path = "/static/"
 app.jinja_env.add_extension('jinja2.ext.do')
+
+if not app.config.get('TWILIO_AUTH_TOKEN'):
+    twilio_enabled = False
+
+if twilio_enabled:
+    app.config['sms_provider'] = 'twilio'
+elif not twilio_enabled and app.config.get('NEXMO_KEY'):
+    app.config['sms_provider'] = 'nexmo'
+else:
+    app.config['sms_provider'] = None
 
 # Create the database object
 db = SQLAlchemy(app)

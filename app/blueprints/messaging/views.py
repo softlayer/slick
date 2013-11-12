@@ -1,9 +1,9 @@
 from flask import flash, redirect, render_template, request, url_for
-from flask.ext.login import login_required
 
 from SoftLayer import MessagingManager
 
 from app.utils.core import get_client
+from app.utils.session import login_required
 #from .forms import CreateSubnetForm
 #from .manager import cancel_subnet, create_subnet
 

@@ -119,6 +119,24 @@ def get_server(server_id, full_data=False):
     return server
 
 
+def reload_hw(server_id):
+    """ Wrapper for the HardwareManager's reload() call.
+
+    :param int server_id: The ID of the server to reload.
+    """
+
+    try:
+        get_hardware_manager().reload(server_id)
+        success = True
+        message = 'Reload request issued. You will receive an email when ' \
+                  'the reload is complete.'
+    except SoftLayerAPIError as exception:
+        success = False
+        message = str(exception)
+
+    return (success, message)
+
+
 def place_order(**kwargs):
     try:
         get_hardware_manager().place_order(**kwargs)

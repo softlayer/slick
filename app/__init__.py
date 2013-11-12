@@ -2,7 +2,7 @@ import importlib
 from os import listdir
 from os.path import dirname, abspath, join, isdir, exists
 
-from flask import Flask, g
+from flask import Flask, g, session
 from flask.ext.login import LoginManager, current_user
 from flask.ext.sqlalchemy import SQLAlchemy
 #from flask_debugtoolbar import DebugToolbarExtension

@@ -2,10 +2,10 @@ from __future__ import division
 import json
 
 from flask import redirect, url_for, flash, request, render_template
-from flask.ext.login import login_required
 
 from app.utils.core import get_client
 from app.utils.nested_dict import lookup
+from app.utils.session import login_required
 from app.blueprints.vm.forms import CreateVMForm
 from app.blueprints.vm.manager import (all_instances, all_instance_options,
                                        cancel_instance, change_port_speed,

@@ -1,15 +1,15 @@
 import json
 
 from flask import redirect, url_for, flash, request, render_template
-from flask.ext.login import login_required
 from SoftLayer import SoftLayerAPIError
 from wtformsparsleyjs import SelectField
 from wtforms.validators import Required
 
 from app.utils.nested_dict import lookup
+from app.utils.session import login_required
 from .manager import (all_servers, get_hourly_create_options, get_server,
                       place_order, verify_order, get_monthly_create_options,
-                      get_available_monthly_server_packages)
+                      get_available_monthly_server_packages, reload_hw)
 from .forms import CreateHourlyForm, CreateMonthlyForm
 
 
@@ -204,6 +204,12 @@ def price_check(server_type):
     except SoftLayerAPIError as e:
         return render_template('server_price_quote_error.html',
                                error=str(e.message))
+
+
+@login_required
+def reload_server(server_id):
+    (success, message) = reload_hw(server_id)
+    return json.dumps({'success': success, 'message': message})
 
 
 @login_required

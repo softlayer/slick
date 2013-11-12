@@ -1,8 +1,8 @@
 from flask import render_template
-from flask.ext.login import login_required
 
 from app.utils.core import get_client
 from app.utils.date import parse_date
+from app.utils.session import login_required
 
 
 @login_required

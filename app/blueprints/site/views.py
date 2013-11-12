@@ -8,7 +8,7 @@ import urlparse
 
 from flask import (g, redirect, url_for, flash, request, render_template,
                    session, Response)
-from flask.ext.login import login_user, logout_user, login_required
+from flask.ext.login import login_user, logout_user
 
 from SoftLayer import Client, SoftLayerAPIError
 
@@ -16,6 +16,7 @@ from app import app, db, lm
 from app.blueprints.site.forms import LoginForm, ProfileForm, TwoFactorForm
 from app.blueprints.site.models import User
 from app.utils.core import get_client
+from app.utils.session import login_required
 
 from app.utils.nexmomessage import NexmoMessage
 
@@ -28,7 +29,13 @@ except ImportError:
 
 @login_required
 def auth_qr_code():
-    code = _generate_passcode(True)
+    domain = urlparse.urlparse(request.url).netloc
+    if not domain:
+        domain = 'slick.sftlyr.ws'
+    totp = pyotp.TOTP(app.config['OTP_SECRET'])
+
+    code = totp.provisioning_uri('%s@%s' % (g.user.username, domain))
+
     img = qrcode.make(code)
     stream = StringIO.StringIO()
     img.save(stream)
@@ -131,31 +138,44 @@ def profile():
     return render_template('site_profile.html', **payload)
 
 
-@login_required
 def two_factor_login():
+    if not g.user:
+        return redirect(url_for('login'))
+
     if not app.config.get('sms_provider'):
         session['two_factor_passed'] = True
         flash("Two factor authentication not configured. Logging you in.",
               'success')
         return redirect(url_for('.index'))
 
-#    if not session.get('two_factor_passcode'):
-#        session['two_factor_passcode'] = _generate_passcode()
-#        (success, message) = _send_passcode(session['two_factor_passcode'])
-
-    passcode = _generate_passcode()
     form = TwoFactorForm()
-    if form.validate_on_submit():
-        if form.passcode.data == passcode:
-            session['two_factor_passed'] = True
-            flash("Authentication successful.", 'success')
-            return redirect(request.args.get('next') or
-                            url_for('.index'))
-
     payload = {
         'title': 'Two-Factor Authentication',
         'form': form,
     }
+
+    if g.user.use_two_factor == 'sms':
+        payload['use_sms'] = True
+
+        if not session.get('sms_code_sent') or request.args.get('generate'):
+            (passcode, counter) = _generate_passcode()
+            session['two_factor_counter'] = counter
+            (success, message) = _send_passcode(passcode)
+            if success:
+                session['sms_code_sent'] = True
+                flash(message, 'success')
+            else:
+                flash(message, 'error')
+
+    if form.validate_on_submit():
+        if _validate_passcode(form.passcode.data):
+            session['two_factor_counter'] = None
+            session['two_factor_passed'] = True
+            flash("Authentication successful.", 'success')
+            return redirect(request.args.get('next') or
+                            url_for('.index'))
+        else:
+            flash('Invalid passcode', 'error')
 
     return render_template('site_two_factor.html', **payload)
 
@@ -181,19 +201,14 @@ def _authenticate_with_password(username, password, question_id=None,
 
 
 def _generate_passcode(url=False):
-    user = g.user
-    domain = urlparse.urlparse(request.url).netloc
-    if not domain:
-       domain = 'slick.sftlyr.ws'
-    totp = pyotp.TOTP(app.config['TOTP_SECRET'])
-
-    if url:
-        return totp.provisioning_uri('%s@%s' % (g.user.username, domain))
-    return str(totp.now())
+    hotp = pyotp.HOTP(app.config['OTP_SECRET'])
+    counter = random.randint(1, 65536)
+    return (hotp.at(counter), counter)
 
 
 def _send_passcode(passcode):
     user = g.user
+    passcode = str(passcode)
 
     if user.use_two_factor != 'none' and user.phone_number:
         # TODO - Maybe move all this stuff out into wrapper modules
@@ -211,7 +226,7 @@ def _send_passcode(passcode):
                 try:
                     success = True
                     message = 'The passcode has been sent to your phone ' \
-                              'number on record.'
+                              'number on record. This code will expire soon.'
                     result = client.sms.messages.create(body=sms_body,
                                                         to=user.phone_number,
                                                         from_=f_number)
@@ -253,3 +268,13 @@ def _send_passcode(passcode):
         return (success, message)
 
     return (False, 'Two factor authentication not configured.')
+
+
+def _validate_passcode(passcode):
+    passcode = int(passcode)
+    if session['two_factor_counter']:
+        hotp = pyotp.HOTP(app.config['OTP_SECRET'])
+        return hotp.verify(passcode, session['two_factor_counter'])
+    else:
+        totp = pyotp.TOTP(app.config['OTP_SECRET'])
+        return totp.verify(passcode)

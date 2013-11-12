@@ -28,6 +28,10 @@ blueprint.add_url_rule('/index', view_func=views.index)
 blueprint.add_url_rule('/priceCheck/<string:server_type>',
                        view_func=views.price_check, methods=['GET', 'POST'])
 
+# Server Reload
+blueprint.add_url_rule('/reload/<int:server_id>',
+                       view_func=views.reload_server)
+
 # Server Status (AJAX call)
 blueprint.add_url_rule('/status', view_func=views.status)
 blueprint.add_url_rule('/status/<int:server_id>', view_func=views.status)

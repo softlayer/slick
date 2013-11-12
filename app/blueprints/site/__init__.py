@@ -11,6 +11,8 @@ app.add_menu('right', 'site_module.logout', 'Logout')
 blueprint.add_url_rule('/', view_func=views.index)
 blueprint.add_url_rule('/index', view_func=views.index)
 
+blueprint.add_url_rule('/auth_qr_code.png', view_func=views.auth_qr_code)
+
 blueprint.add_url_rule('/login', view_func=views.login,
                        methods=['GET', 'POST'])
 

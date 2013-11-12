@@ -12,7 +12,9 @@ class LoginForm(Form):
 
 
 class ProfileForm(Form):
-    use_two_factor = RadioField(choices=[('0', 'No'), ('1', 'Yes')],
+    use_two_factor = RadioField(choices=[('none', 'No'), ('sms', 'SMS'),
+                                         ('authenticator',
+                                          'Google Authenticator')],
                                 validators=[Required()])
     phone_number = TelField('phone_number', validators=[Required()])
 

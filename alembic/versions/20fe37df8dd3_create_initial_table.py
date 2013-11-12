@@ -19,10 +19,10 @@ def upgrade():
         'user',
         sa.Column('id', sa.Integer, primary_key=True),
         sa.Column('username', sa.Unicode(255), index=True, nullable=False),
-        sa.Column('use_two_factor', sa.Boolean, server_default='0',
-                  nullable=False),
         sa.Column('phone_number', sa.Unicode(45)),
-        sa.Column('use_sms', sa.Boolean, server_default='0', nullable=False)
+        sa.Column('use_two_factor', sa.Enum('none', 'sms', 'voice',
+                                            'authenticator'),
+                  server_default='sms', nullable=False)
     )
 
     op.create_table(

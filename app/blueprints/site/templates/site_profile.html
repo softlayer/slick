@@ -23,7 +23,13 @@
       {% endif %}
     </div>
   </div>
+
   {{ helpers.field_enclosure(form.phone_number(class="form-control"), label='Phone Number', field_name='phone_number', errors=form.phone_number.errors) }}
+
+  <div class="form-group">
+    <label class="col-md-2 control-label">Google Authenticator</label>
+    <div class="col-md-4 form-control-static"><img src="{{ url_for('.auth_qr_code') }}"></div>
+  </div>
 
   {# Submit Buttons #}
   <div class="form-group">

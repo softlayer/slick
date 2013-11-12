@@ -1,9 +1,13 @@
+import pyotp
+import qrcode
 import random
 import re
+import StringIO
 from urllib import quote_plus
+import urlparse
 
 from flask import (g, redirect, url_for, flash, request, render_template,
-                   session)
+                   session, Response)
 from flask.ext.login import login_user, logout_user, login_required
 
 from SoftLayer import Client, SoftLayerAPIError
@@ -20,6 +24,15 @@ try:
     from twilio.rest import TwilioRestClient
 except ImportError:
     pass
+
+
+@login_required
+def auth_qr_code():
+    code = _generate_passcode(True)
+    img = qrcode.make(code)
+    stream = StringIO.StringIO()
+    img.save(stream)
+    return Response(stream.getvalue(), mimetype='image/png')
 
 
 @login_required
@@ -104,8 +117,6 @@ def profile():
     if form.validate_on_submit():
         user.use_two_factor = form.use_two_factor.data
         user.phone_number = form.phone_number.data
-        # TODO - Don't hardcode this if we allow Twilio calls.
-        user.use_sms = 1
         db.session.add(user)
         db.session.commit()
 
@@ -128,17 +139,15 @@ def two_factor_login():
               'success')
         return redirect(url_for('.index'))
 
-    # TODO - This is not secure with the default client-side sessions. If this
-    # moves beyond proof of concept, the session stuff will need to be improved
-    if not session.get('two_factor_passcode'):
-        session['two_factor_passcode'] = _generate_passcode()
-        (success, message) = _send_passcode(session['two_factor_passcode'])
+#    if not session.get('two_factor_passcode'):
+#        session['two_factor_passcode'] = _generate_passcode()
+#        (success, message) = _send_passcode(session['two_factor_passcode'])
 
+    passcode = _generate_passcode()
     form = TwoFactorForm()
     if form.validate_on_submit():
-        if form.passcode.data == session['two_factor_passcode']:
+        if form.passcode.data == passcode:
             session['two_factor_passed'] = True
-            del(session['two_factor_passcode'])
             flash("Authentication successful.", 'success')
             return redirect(request.args.get('next') or
                             url_for('.index'))
@@ -171,16 +180,22 @@ def _authenticate_with_password(username, password, question_id=None,
     return True
 
 
-def _generate_passcode():
-    range_start = 10**(6-1)
-    range_end = (10**6)-1
-    return str(random.randint(range_start, range_end))
+def _generate_passcode(url=False):
+    user = g.user
+    domain = urlparse.urlparse(request.url).netloc
+    if not domain:
+       domain = 'slick.sftlyr.ws'
+    totp = pyotp.TOTP(app.config['TOTP_SECRET'])
+
+    if url:
+        return totp.provisioning_uri('%s@%s' % (g.user.username, domain))
+    return str(totp.now())
 
 
 def _send_passcode(passcode):
     user = g.user
 
-    if user.use_two_factor and user.phone_number:
+    if user.use_two_factor != 'none' and user.phone_number:
         # TODO - Maybe move all this stuff out into wrapper modules
         sms_body = "Your login token is: " + passcode
 
@@ -192,7 +207,7 @@ def _send_passcode(passcode):
             f_number = random.choice(app.config['TWILIO_FROM_NUMBERS'])
             client = TwilioRestClient(app.config['TWILIO_ACCOUNT_SID'],
                                       _app.config['TWILIO_AUTH_TOKEN'])
-            if user.use_sms:
+            if user.use_two_factor == 'sms':
                 try:
                     success = True
                     message = 'The passcode has been sent to your phone ' \

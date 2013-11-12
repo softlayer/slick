@@ -15,6 +15,7 @@ if sys.version_info <= (2, 6):
 requires = [
     'flask',
     'flask-login',
+    'flask-wtf',
     'sqlalchemy',
     'flask-sqlalchemy',
     'softlayer',
@@ -22,6 +23,8 @@ requires = [
     'pyotp',
     'pillow',
     'qrcode',
+    'wtforms',
+    'wtforms-parsleyjs',
 ]
 
 setup(

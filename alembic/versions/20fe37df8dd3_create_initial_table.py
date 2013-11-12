@@ -21,7 +21,8 @@ def upgrade():
         sa.Column('username', sa.Unicode(255), index=True, nullable=False),
         sa.Column('phone_number', sa.Unicode(45)),
         sa.Column('use_two_factor', sa.Enum('none', 'sms', 'voice',
-                                            'authenticator'),
+                                            'authenticator',
+                                            name='two_factor_types'),
                   server_default='sms', nullable=False)
     )
 
@@ -32,7 +33,7 @@ def upgrade():
         sa.Column('os', sa.Unicode(255)),
         sa.Column('cpus', sa.Integer, nullable=False, server_default='0'),
         sa.Column('memory', sa.Integer, nullable=False, server_default='0'),
-        sa.Column('network', sa.Enum('10', '100', '1000')),
+        sa.Column('network', sa.Integer, nullable=False, server_default='100'),
         sa.Column('private_network_only', sa.Boolean, nullable=False,
                   server_default='0'),
         sa.Column('dedicated_host', sa.Boolean, nullable=False,

@@ -119,7 +119,29 @@ def get_server(server_id, full_data=False):
     return server
 
 
-def reload_hw(server_id):
+def reboot_server(server_id, soft=True):
+    """ Provides a single interface function for rebooting a server.
+
+    :param int server_id: The ID of the server to reboot.
+    :param bool soft: Flag to determine if this should be a soft or hard
+                      reboot. [Default: true (soft)]
+    """
+    try:
+        vg = get_client()['Hardware_Server']
+        if soft:
+            vg.rebootSoft(id=server_id)
+        else:
+            vg.rebootHard(id=server_id)
+        success = True
+        message = 'Reboot request sent to instance.'
+    except SoftLayerAPIError as exception:
+        success = False
+        message = str(exception)
+
+    return (success, message)
+
+
+def reload_server(server_id):
     """ Wrapper for the HardwareManager's reload() call.
 
     :param int server_id: The ID of the server to reload.

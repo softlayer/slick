@@ -9,7 +9,8 @@ from app.utils.nested_dict import lookup
 from app.utils.session import login_required
 from .manager import (all_servers, get_hourly_create_options, get_server,
                       place_order, verify_order, get_monthly_create_options,
-                      get_available_monthly_server_packages, reload_hw)
+                      get_available_monthly_server_packages, reload_server,
+                      reboot_server)
 from .forms import CreateHourlyForm, CreateMonthlyForm
 
 
@@ -172,6 +173,12 @@ def get_password(object_id, username):
 
 
 @login_required
+def hard_reboot_server(server_id):
+    (success, message) = reboot_server(server_id, False)
+    return json.dumps({'success': success, 'message': message})
+
+
+@login_required
 def index():
     servers = all_servers()
     payload = {}
@@ -207,8 +214,14 @@ def price_check(server_type):
 
 
 @login_required
-def reload_server(server_id):
-    (success, message) = reload_hw(server_id)
+def server_reload(server_id):
+    (success, message) = reload_server(server_id)
+    return json.dumps({'success': success, 'message': message})
+
+
+@login_required
+def soft_reboot_server(server_id):
+    (success, message) = reboot_server(server_id)
     return json.dumps({'success': success, 'message': message})
 
 

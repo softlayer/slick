@@ -5,7 +5,7 @@ from os.path import dirname, abspath, join, isdir, exists
 from flask import Flask, g
 from flask.ext.login import LoginManager, current_user
 from flask.ext.sqlalchemy import SQLAlchemy
-from flask_debugtoolbar import DebugToolbarExtension
+#from flask_debugtoolbar import DebugToolbarExtension
 
 twilio_enabled = True
 try:

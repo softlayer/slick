@@ -18,9 +18,12 @@ blueprint.add_url_rule('/login', view_func=views.login,
 
 blueprint.add_url_rule('/logout', view_func=views.logout)
 
+blueprint.add_url_rule('/login/twofactor',
+                       view_func=views.two_factor_login,
+                       methods=['GET', 'POST'])
+
 blueprint.add_url_rule('/profile', view_func=views.profile,
                        methods=['GET', 'POST'])
 
-blueprint.add_url_rule('/login/twofactor',
-                       view_func=views.two_factor_login,
+blueprint.add_url_rule('/search', view_func=views.search,
                        methods=['GET', 'POST'])

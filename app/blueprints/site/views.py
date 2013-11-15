@@ -1,3 +1,4 @@
+import json
 import pyotp
 import qrcode
 import random
@@ -10,7 +11,7 @@ from flask import (g, redirect, url_for, flash, request, render_template,
                    session, Response)
 from flask.ext.login import login_user, logout_user
 
-from SoftLayer import Client, SoftLayerAPIError
+from SoftLayer import Client, SoftLayerAPIError, CCIManager, HardwareManager
 
 from app import app, db, lm
 from app.blueprints.site.forms import LoginForm, ProfileForm, TwoFactorForm
@@ -90,7 +91,7 @@ def login():
         session['use_two_factor'] = True
         session['two_factor_passed'] = False
 
-        if not user.use_two_factor:
+        if not user.use_two_factor or user.use_two_factor == 'none':
             session['use_two_factor'] = False
             session['two_factor_passed'] = True
 
@@ -136,6 +137,49 @@ def profile():
     }
 
     return render_template('site_profile.html', **payload)
+
+
+def search():
+    term = request.args.get('term')
+
+    if not term:
+        return ''
+
+    results = []
+
+    client = get_client()
+#    hostname_regex = re.compile('\w')
+
+    if 'vm' in app.config['installed_blueprints']:
+        cci = CCIManager(client)
+#        if hostname_regex.match(term):
+        for vm in cci.list_instances():
+            if term in vm['hostname'] or term in vm['primaryIpAddress']:
+                text = '%s (%s)' % (vm['fullyQualifiedDomainName'],
+                                    vm['primaryIpAddress'])
+                text = text.replace(term,
+                                    '<span class="text-primary">%s</span>'
+                                    % term)
+
+                results.append({'label': '<strong>VM:</strong> ' + text,
+                                'value': url_for('vm_module.view',
+                                                 vm_id=vm['id'])})
+    if 'servers' in app.config['installed_blueprints']:
+        hw = HardwareManager(client)
+
+        for svr in hw.list_hardware():
+            if term in svr['hostname'] or term in svr['primaryIpAddress']:
+                text = '%s (%s)' % (svr['fullyQualifiedDomainName'],
+                                    svr['primaryIpAddress'])
+                text = text.replace(term,
+                                    '<span class="text-primary">%s</span>'
+                                    % term)
+
+                results.append({'label': '<strong>Server:</strong> ' + text,
+                                'value': url_for('server_module.view',
+                                                 server_id=svr['id'])})
+
+    return json.dumps(results)
 
 
 def two_factor_login():
@@ -272,7 +316,7 @@ def _send_passcode(passcode):
 
 def _validate_passcode(passcode):
     passcode = int(passcode)
-    if session['two_factor_counter']:
+    if session.get('two_factor_counter'):
         hotp = pyotp.HOTP(app.config['OTP_SECRET'])
         return hotp.verify(passcode, session['two_factor_counter'])
     else:

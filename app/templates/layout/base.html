@@ -9,6 +9,7 @@
     <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" media="screen">
     <link href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/2.0.1/css/toastr.min.css" rel="stylesheet" media="screen">
     <link href="//ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css" rel="stylesheet" media="screen">
+    <link href="//code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" rel="stylesheet" media="screen">
 {# @TODO - Figure out where these come from
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -17,6 +18,24 @@
     <![endif]-->  
 #}
     <link href="/static/css/site/slick.css" rel="stylesheet" media="screen">
+    <style>
+    .ui-autocomplete {
+      padding-top: 10px;
+      max-height: 200px;
+      overflow-y: auto;
+                  /* prevent horizontal scrollbar */
+      overflow-x: hidden;
+    }
+    /* IE 6 doesn't support max-height
+     * we use height instead, but this forces the menu to always be this tall
+     */
+    * html .ui-autocomplete {
+      height: 200px;
+    }
+    .ui-autocomplete-loading {
+      background: white url('/static/img/ajax-loader.gif') right center no-repeat;
+    }
+    </style>
     {% block css %}{% endblock %}
   </head>
   <body>
@@ -38,6 +57,7 @@
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
     <script src="/static/js/bootbox.min.js"></script>
@@ -67,7 +87,34 @@
         $.extend( $.fn.dataTable.defaults, {
             "sPaginationType": "full_numbers",
           } );
-      });
+
+        var cache = {};
+
+        $("#global_search").autocomplete({
+            minLength: 2,
+            source: function( request, response ) {
+              var term = request.term;
+              if ( term in cache ) {
+                response( cache[ term ] );
+                return;
+              }
+              
+              $.getJSON( "{{ url_for('site_module.search') }}", request, function( data, status, xhr ) {
+                  cache[ term ] = data;
+                  response( data );
+                });
+            },
+            select: function (event, ui) {
+              event.preventDefault();
+              window.location.href = ui.item.value;
+            },
+          }).data( "ui-autocomplete" )._renderItem = function( ul, item ) {
+              return $( "<li></li>" )
+                .data( "item.autocomplete", item )
+                .append( "<a>"+ item.label + "</a>" ) 
+                .appendTo( ul );
+        };;
+    });
     </script>
     {% block javascript %}{% endblock %}
   </body>

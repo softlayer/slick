@@ -74,7 +74,8 @@ def before_request():
 def generate_menu():
     return dict(
         left_menu=sorted(app.left_menu, key=lambda x: (x[2], x[1])),
-        right_menu=sorted(app.right_menu, key=lambda x: (x[2], x[1]))
+        right_menu=sorted(app.right_menu, key=lambda x: (x[2], x[1]),
+                          reverse=True)
     )
 
 

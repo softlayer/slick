@@ -1,0 +1,56 @@
+{% extends "layout/base.html" %}
+
+{% block content %}
+{% if keys %}
+<div class="table-responsive">
+  <table class="table table-striped table-bordered" id="ssh_key_table">
+    <thead>
+      <tr>
+        <th>Label</th>
+        <th>Fingerprint</th>
+        <th>Notes</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for key in keys %}
+      <tr>
+        <td>{{ key.label }}</td>
+        <td>{{ key.fingerprint }}</td>
+        <td>{{ key.notes }}</td>
+        <td>
+          <div class="btn-group">
+            <button type="button" class="btn btn-primary btn-xs dropdown-toggle" data-toggle="dropdown">
+            Action <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+              <li><a href="{{ url_for('.delete', key_id=key.id) }}" data-confirm="This will delete this SSH key! Are you sure you want to continue?">Cancel</a></li>
+              {#
+              <li><a href="{{ url_for('.subnet_create', vlan_id=vlan.id) }}">Create Subnet</a></li>
+              <li><a href="{{ url_for('.vlan_view', vlan_id=vlan.id) }}">View</a></li>
+              #}
+            </ul>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="panel panel-danger">
+  <div class="panel-heading">Error</div>
+  <div class="panel-body">No SSH keys found on your account.</div>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block javascript %}
+<script type="text/javascript">
+$(document).ready(function() {
+    var oTable = $('#ssh_key_table').dataTable();
+    oTable.fnFilter('{{ search }}');
+});
+</script>
+{% endblock %}

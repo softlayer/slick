@@ -34,3 +34,22 @@ def index():
     }
 
     return render_template("key_index.html", **payload)
+
+
+@login_required
+def view(key_id):
+    mgr = SshKeyManager(get_client())
+
+    key = mgr.get_key(key_id)
+
+    if not key:
+        flash('SSH key not found.', 'error')
+        return redirect(url_for('.index'))
+
+    payload = {
+        'title': 'View SSH Key',
+        'subheader': key['label'],
+        'key': key,
+    }
+
+    return render_template("key_view.html", **payload)

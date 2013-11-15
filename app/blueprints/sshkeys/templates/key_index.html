@@ -24,11 +24,8 @@
             Action <span class="caret"></span>
             </button>
             <ul class="dropdown-menu">
+              <li><a href="{{ url_for('.view', key_id=key.id) }}">View</a>
               <li><a href="{{ url_for('.delete', key_id=key.id) }}" data-confirm="This will delete this SSH key! Are you sure you want to continue?">Cancel</a></li>
-              {#
-              <li><a href="{{ url_for('.subnet_create', vlan_id=vlan.id) }}">Create Subnet</a></li>
-              <li><a href="{{ url_for('.vlan_view', vlan_id=vlan.id) }}">View</a></li>
-              #}
             </ul>
           </div>
         </td>

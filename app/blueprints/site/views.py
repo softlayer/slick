@@ -11,7 +11,8 @@ from flask import (g, redirect, url_for, flash, request, render_template,
                    session, Response)
 from flask.ext.login import login_user, logout_user
 
-from SoftLayer import Client, SoftLayerAPIError, CCIManager, HardwareManager
+from SoftLayer import (Client, SoftLayerAPIError, CCIManager, HardwareManager,
+                       SshKeyManager)
 
 from app import app, db, lm
 from app.blueprints.site.forms import LoginForm, ProfileForm, TwoFactorForm
@@ -140,10 +141,12 @@ def profile():
 
 
 def search():
-    term = request.args.get('term')
-
-    if not term:
+    if not request.args.get('term'):
         return ''
+
+    match_string = '<span class="text-primary">%s</span>' % \
+                   request.args.get('term')
+    term = re.compile(request.args.get('term'), re.IGNORECASE)
 
     results = []
 
@@ -154,12 +157,11 @@ def search():
         cci = CCIManager(client)
 #        if hostname_regex.match(term):
         for vm in cci.list_instances():
-            if term in vm['hostname'] or term in vm['primaryIpAddress']:
+            if term.match(vm['hostname']) or \
+               term.match(vm['primaryIpAddress']):
                 text = '%s (%s)' % (vm['fullyQualifiedDomainName'],
                                     vm['primaryIpAddress'])
-                text = text.replace(term,
-                                    '<span class="text-primary">%s</span>'
-                                    % term)
+                text = term.sub(match_string, text)
 
                 results.append({'label': '<strong>VM:</strong> ' + text,
                                 'value': url_for('vm_module.view',
@@ -168,16 +170,26 @@ def search():
         hw = HardwareManager(client)
 
         for svr in hw.list_hardware():
-            if term in svr['hostname'] or term in svr['primaryIpAddress']:
+            if term.match(svr['hostname']) or \
+               term.match(svr['primaryIpAddress']):
                 text = '%s (%s)' % (svr['fullyQualifiedDomainName'],
                                     svr['primaryIpAddress'])
-                text = text.replace(term,
-                                    '<span class="text-primary">%s</span>'
-                                    % term)
+                text = term.sub(match_string, text)
 
                 results.append({'label': '<strong>Server:</strong> ' + text,
                                 'value': url_for('server_module.view',
                                                  server_id=svr['id'])})
+    if 'sshkeys' in app.config['installed_blueprints']:
+        ssh = SshKeyManager(client)
+
+        for key in ssh.list_keys():
+            if term.match(key['label']) or term.match(key['fingerprint']):
+                text = '%s (%s)' % (key['label'], key['fingerprint'])
+                text = term.sub(match_string, text)
+
+                results.append({'label': '<strong>SSH Key:</strong> ' + text,
+                                'value': url_for('ssh_module.view',
+                                                 key_id=key['id'])})
 
     return json.dumps(results)
 

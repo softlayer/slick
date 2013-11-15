@@ -18,3 +18,6 @@ blueprint.add_url_rule('/delete/<int:key_id>', view_func=views.delete)
 # Key List
 blueprint.add_url_rule('/', view_func=views.index)
 blueprint.add_url_rule('/index', view_func=views.index)
+
+# Key View
+blueprint.add_url_rule('/view/<int:key_id>', view_func=views.view)

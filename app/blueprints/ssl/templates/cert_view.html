@@ -1,0 +1,41 @@
+{% extends "layout/base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="col-md-10">
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          <h3 class="panel-title">SSL Certificate</h3>
+        </div>
+        <div class="panel-body">
+          <dl class="dl-horizontal">
+            <dt>Organization Name</dt>
+            <dd>{{ cert.organizationName }}</dd>
+            <dt>Valid Until</dt>
+            <dd>{{ cert.validityEnd.month }}/{{ cert.validityEnd.day }}/{{ cert.validityEnd.year }} ({{ cert.validityDays }} Days)</dd>
+            <dt>Notes</dt>
+            <dd>{{ cert.notes|default('N/A') }}</dd>
+            <dt>Certificate</dt>
+            <dd>
+              <a data-toggle="collapse" data-parent="#accordion" href="#collapseCert">
+                Display Certificate
+              </a>
+              <div id="collapseCert" class="panel-collapse collapse">
+                <pre class="pre-scrollable"><small>{{ cert.certificate }}</small></pre>
+              </div>
+            </dd>
+            <dt>Private Key</dt>
+            <dd>
+              <a data-toggle="collapse" data-parent="#accordion" href="#collapseKey">
+                Display Private Key
+              </a>
+              <div id="collapseKey" class="panel-collapse collapse">
+                <pre class="pre-scrollable"><small>{{ cert.privateKey }}</small></pre>
+              </div>
+            </dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+</div>
+{% endblock %}

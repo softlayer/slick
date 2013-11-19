@@ -25,10 +25,19 @@ class Slick(Flask):
         self.widgets = []
 
     def add_menu(self, side, url, label, order=0):
-        if 'left' == side:
-            self.left_menu.append((url, label, order))
-        else:
-            self.right_menu.append((url, label, order))
+        menu = self.left_menu
+        if 'right' == side:
+            menu = self.right_menu
+
+        item_found = False
+        for i, data in enumerate(menu):
+            if label == data[1] and isinstance(data[0], list):
+                new_url = data[0] + url
+                menu[i] = (new_url, data[1], data[2])
+                item_found = True
+
+        if not item_found:
+            menu.append((url, label, order))
 
     def add_widget(self, widget):
         self.widgets.append(widget)

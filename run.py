@@ -1,3 +1,3 @@
 #!env/bin/python
-from app import app
+from slick import app
 app.run(host="0.0.0.0", debug = True)

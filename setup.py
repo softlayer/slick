@@ -1,3 +1,4 @@
+import os
 import sys
 
 try:
@@ -22,19 +23,43 @@ requires = [
     'alembic',
     'pyotp',
     'pillow',
+    'psycopg2',
     'qrcode',
     'wtforms',
     'wtforms-parsleyjs',
 ]
 
+
+def find_template_dirs():
+    suffix = "*.html"
+    template_dirs = []
+
+    template_dirs.append(os.path.join('templates', suffix))
+
+    for _, dirs, _ in os.walk("slick/templates"):
+        for d in dirs:
+            template_dirs.append(os.path.join('templates', d, suffix))
+
+    for _, dirs, _ in os.walk("slick/blueprints"):
+        for d in dirs:
+            path = 'slick/blueprints/%s/templates' % d
+            if os.path.exists(path):
+                template_dirs.append(os.path.join(path, suffix))
+
+    print template_dirs
+    return template_dirs
+
+
 setup(
     name='Slick',
-    version='0.1',
+    version='0.2',
 #    description=description,
 #    long_description=long_description,
     author='SoftLayer Technologies, Inc.',
     author_email='sldn@softlayer.com',
     packages=find_packages(),
+    include_package_data=True,
+#    package_data={'slick': find_template_dirs()},
     license='MIT',
 #    zip_safe=False,
 #    url='http://github.com/softlayer/softlayer-api-python-client',

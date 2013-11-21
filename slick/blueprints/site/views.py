@@ -158,9 +158,9 @@ def search():
 #        if hostname_regex.match(term):
         for vm in cci.list_instances():
             if term.match(vm['hostname']) or \
-               term.match(vm['primaryIpAddress']):
+               term.match(vm.get('primaryIpAddress', '')):
                 text = '%s (%s)' % (vm['fullyQualifiedDomainName'],
-                                    vm['primaryIpAddress'])
+                                    vm.get('primaryIpAddress', 'No Public IP'))
                 text = term.sub(match_string, text)
 
                 results.append({'label': '<strong>VM:</strong> ' + text,
@@ -171,9 +171,10 @@ def search():
 
         for svr in hw.list_hardware():
             if term.match(svr['hostname']) or \
-               term.match(svr['primaryIpAddress']):
+               term.match(svr.get('primaryIpAddress', '')):
                 text = '%s (%s)' % (svr['fullyQualifiedDomainName'],
-                                    svr['primaryIpAddress'])
+                                    svr.get('primaryIpAddress',
+                                            'No Public IP'))
                 text = term.sub(match_string, text)
 
                 results.append({'label': '<strong>Server:</strong> ' + text,

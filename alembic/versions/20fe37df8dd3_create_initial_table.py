@@ -23,7 +23,7 @@ def upgrade():
         sa.Column('use_two_factor', sa.Enum('none', 'sms', 'voice',
                                             'authenticator',
                                             name='two_factor_types'),
-                  server_default='sms', nullable=False)
+                  server_default='none', nullable=False)
     )
 
     op.create_table(

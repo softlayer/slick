@@ -26,3 +26,7 @@ blueprint.add_url_rule('/profile', view_func=views.profile,
 
 blueprint.add_url_rule('/search', view_func=views.search,
                        methods=['GET', 'POST'])
+
+blueprint.add_url_rule('/question',
+                       view_func=views.security_question,
+                       methods=['GET', 'POST'])

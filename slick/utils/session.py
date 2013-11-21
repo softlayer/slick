@@ -10,7 +10,8 @@ def login_required(func):
             return func(*args, **kwargs)
         elif not current_user.is_authenticated():
             return current_app.login_manager.unauthorized()
-        elif session.get('use_two_factor') and not session.get('two_factor_passed'):
+        elif (session.get('use_two_factor') and
+              not session.get('two_factor_passed')):
             return redirect(url_for('site_module.two_factor_login'))
         return func(*args, **kwargs)
     return decorated_view

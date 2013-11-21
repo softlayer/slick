@@ -2,7 +2,8 @@ from flask.ext.wtf import Form
 from wtforms import RadioField
 from wtforms.fields.html5 import TelField
 from wtforms.validators import Required
-from wtformsparsleyjs import TextField, PasswordField, BooleanField
+from wtformsparsleyjs import (TextField, PasswordField, BooleanField,
+                              SelectField)
 
 
 class LoginForm(Form):
@@ -17,6 +18,11 @@ class ProfileForm(Form):
                                           'Google Authenticator')],
                                 validators=[Required()])
     phone_number = TelField('phone_number', validators=[Required()])
+
+
+class SecurityQuestionForm(Form):
+    question_id = SelectField('question_id')
+    answer = TextField('answer', validators=[Required()])
 
 
 class TwoFactorForm(Form):

@@ -15,7 +15,7 @@ from SoftLayer import (Client, SoftLayerAPIError, CCIManager, HardwareManager,
                        SshKeyManager)
 
 from slick import app, db, lm
-from .forms import LoginForm, ProfileForm, TwoFactorForm
+from .forms import LoginForm, ProfileForm, SecurityQuestionForm, TwoFactorForm
 from .models import User
 from slick.utils.core import get_client
 from slick.utils.session import login_required
@@ -69,6 +69,7 @@ def login():
         elif 'security_question' == auth:
             session['un'] = form.username.data
             session['pw'] = form.password.data
+            session['remember'] = form.remember_me.data
             session['security_question_answered'] = False
             flash('Please answer one of your security questions to proceed.',
                   'success')
@@ -76,29 +77,10 @@ def login():
         else:
             session['security_question_answered'] = True
 
-        client = get_client()
-        if not client['Account'].getObject():
-            flash('Invalid credentials, please try again.', 'error')
-            return logout()
+        user = _perform_login(form.username.data, form.remember_me.data)
 
-        user = User.query.filter_by(username=form.username.data).first()
-        if user is None:
-            user = User(username=form.username.data)
-            db.session.add(user)
-            db.session.commit()
-        login_user(user, remember=form.remember_me.data)
+        _check_two_factor(user)
         flash('Login successful', 'success')
-
-        session['use_two_factor'] = True
-        session['two_factor_passed'] = False
-
-        if not user.use_two_factor or user.use_two_factor == 'none':
-            session['use_two_factor'] = False
-            session['two_factor_passed'] = True
-
-        if session['use_two_factor']:
-            session['next_page'] = request.args.get('next')
-            return redirect(url_for('.two_factor_login'))
 
         return redirect(request.args.get('next') or
                         url_for('.index'))
@@ -195,6 +177,55 @@ def search():
     return json.dumps(results)
 
 
+def security_question():
+    if not g.user:
+        return redirect(url_for('login'))
+    elif (session.get('use_two_factor') and
+          not session.get('two_factor_passed')):
+        return redirect(url_for('.two_factor_login'))
+    elif session.get('security_question_answered'):
+        return redirect(url_for('.index'))
+
+    form = SecurityQuestionForm()
+    questions = get_client()['User_Security_Question'].getAllObjects()
+
+    choices = []
+    for q in questions:
+        choices.append((str(q['id']), q['question']))
+    form.question_id.choices = choices
+
+    payload = {
+        'form': form,
+        'questions': questions,
+        'title': 'Security Question',
+    }
+
+    if form.validate_on_submit():
+        auth = _authenticate_with_password(session['un'],
+                                           session['pw'],
+                                           form.question_id.data,
+                                           form.answer.data)
+
+        if auth and auth != 'security_question':
+            session['security_question_answered'] = True
+
+            user = _perform_login(session['un'], session.get('remember'))
+
+            del(session['un'])
+            del(session['pw'])
+            if session.get('remember'):
+                del(session['remember'])
+
+            _check_two_factor(user)
+
+            flash("Authentication successful.", 'success')
+            return redirect(session.get('next_page') or url_for('.index'))
+        else:
+            flash("Incorrect security question/answer specified.", 'error')
+
+    return render_template('site_security_question.html', **payload)
+
+
 def two_factor_login():
     if not g.user:
         return redirect(url_for('login'))
@@ -257,10 +288,39 @@ def _authenticate_with_password(username, password, question_id=None,
     return True
 
 
-def _generate_passcode(url=False):
+def _check_two_factor(user):
+    session['use_two_factor'] = True
+    session['two_factor_passed'] = False
+
+    if not user.use_two_factor or user.use_two_factor == 'none':
+        session['use_two_factor'] = False
+        session['two_factor_passed'] = True
+
+    if session['use_two_factor']:
+        session['next_page'] = request.args.get('next')
+        return redirect(url_for('.two_factor_login'))
+
+
+def _generate_passcode():
     hotp = pyotp.HOTP(app.config['OTP_SECRET'])
     counter = random.randint(1, 65536)
     return (hotp.at(counter), counter)
+
+
+def _perform_login(username, remember):
+    client = get_client()
+    if not client['Account'].getObject():
+        flash('Invalid credentials, please try again.', 'error')
+        return logout()
+
+    user = User.query.filter_by(username=username).first()
+    if user is None:
+        user = User(username=username)
+        db.session.add(user)
+        db.session.commit()
+    login_user(user, remember=remember)
+
+    return user
 
 
 def _send_passcode(passcode):

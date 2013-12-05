@@ -29,4 +29,5 @@ blueprint.add_url_rule('/record/delete/<int:record_id>',
                        view_func=views.record_delete)
 
 # Record Edit
-blueprint.add_url_rule('/record/<int:record_id>', view_func=views.record_edit)
+blueprint.add_url_rule('/record/<int:record_id>', view_func=views.record_edit,
+                       methods=['GET', 'POST'])

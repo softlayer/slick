@@ -62,3 +62,20 @@ def get_zone(zone_id):
         zone = None
 
     return zone
+
+
+def update_record(record):
+    """ Updates the specified record.
+
+    :param dict record: The full set of information about the record being
+    updated. Must contain an 'id' parameter, which will be updated.
+    """
+    try:
+        get_dns_manager().edit_record(record)
+        success = True
+        message = 'Record updated successfully.'
+    except SoftLayerAPIError as exception:
+        success = False
+        message = str(exception)
+
+    return (success, message)

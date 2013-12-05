@@ -1,7 +1,7 @@
 {% extends "layout/base.html" %}
 
 {% block content %}
-<form action="{{ url_for('.record_add', zone_id=zone.id) }}" method="post" id='zone_record_add_form' class="form-horizontal" role="form">
+<form action="{{ action }}" method="post" id='zone_record_update_form' class="form-horizontal" role="form">
   {{form.hidden_tag()}}
 
   {{ helpers.field_enclosure(form.record(class="form-control"), label='Record', field_name='record', errors=form.record.errors, after='.'+zone.name) }}
@@ -14,8 +14,12 @@
 
   <div class="form-group">
     <div class="col-md-offset-2 col-md-10">
-      <button type="submit" class="btn btn-primary">Add Record</button>
-      <a href="{{ url_for('.index') }}" class="btn btn-default">Cancel</a>
+      <button type="submit" class="btn btn-primary">{{ action_name }} Record</button>
+      {% if action_name == 'Add' %}
+          <a href="{{ url_for('.index') }}" class="btn btn-default">Cancel</a>
+      {% else %}
+          <a href="{{ url_for('.zone_view', zone_id=zone.id) }}" class="btn btn-default">Cancel</a>
+      {% endif %}
     </div>
   </div>
 </form>

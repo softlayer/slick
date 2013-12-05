@@ -58,9 +58,11 @@ def record_add(zone_id):
         'title': 'Add Zone Record',
         'form': form,
         'zone': zone,
+        'action': url_for('.record_add', zone_id=zone_id),
+        'action_name': 'Add',
     }
 
-    return render_template('zone_add_record.html', **payload)
+    return render_template('zone_update_record.html', **payload)
 
 
 @login_required
@@ -95,13 +97,41 @@ def record_edit(record_id):
         flash('DNS record not found.', 'error')
         return redirect(url_for('.index'))
 
+    defaults = record
+    defaults['zone_id'] = record['domain']['id']
+    defaults['record'] = record['host']
+
+    form = ZoneRecordForm(**defaults)
+
+    if form.validate_on_submit():
+        fields = {'id': record_id}
+
+        for field in form:
+            if 'csrf_token' == field.name:
+                continue
+
+            fields[field.name] = field.data
+
+        (success, message) = manager.update_record(fields)
+
+        if success:
+            flash(message, 'success')
+        else:
+            flash(message, 'error')
+
+        return redirect(url_for('.zone_view', zone_id=record['domain']['id']))
+
     payload = {
         'title': 'Edit Zone Record',
         'subheader': '%s.%s' % (record['host'], record['domain']['name']),
         'record': record,
+        'form': form,
+        'action': url_for('.record_edit', record_id=record_id),
+        'action_name': 'Edit',
+        'zone': record['domain'],
     }
 
-    return render_template('zone_edit_record.html', **payload)
+    return render_template('zone_update_record.html', **payload)
 
 
 @login_required

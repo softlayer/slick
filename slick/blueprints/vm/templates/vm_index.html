@@ -7,13 +7,13 @@
   <table class="table table-striped table-bordered" id="vm_table">
     <thead>
       <tr>
-        <th style="width: 25%">Hostname</th>
-        <th style="width: 10%">Datacenter</th>
-        <th style="width: 15%">Public</th>
-        <th style="width: 15%">Private</th>
-        <th style="width: 5%">CPU</th>
-        <th style="width: 5%">Memory</th>
-        <th style="width: 15%">Status</th>
+        <th data-class="expand" style="width: 25%">Hostname</th>
+        <th data-hide="phone" style="width: 10%">Datacenter</th>
+        <th data-hide="phone,tablet" style="width: 15%">Public</th>
+        <th data-hide="phone,tablet" style="width: 15%">Private</th>
+        <th data-hide="phone" style="width: 5%">CPU</th>
+        <th data-hide="phone" style="width: 5%">Memory</th>
+        <th data-hide="phone" style="width: 15%">Status</th>
         <th style="width: 10%">Actions</th>
       </tr>
     </thead>
@@ -100,7 +100,27 @@ function vmAction(vmId, action) {
 }
 
 $(document).ready(function() {
-    var oTable = $('#vm_table').dataTable();
+    var responsiveHelper;
+    var breakpointDefinition = {
+      tablet: 1024,
+      phone : 480
+    };
+    var tableContainer = $('#vm_table');
+
+    var oTable = tableContainer.dataTable({
+        fnPreDrawCallback: function () {
+          // Initialize the responsive datatables helper once.
+          if (!responsiveHelper) {
+            responsiveHelper = new ResponsiveDatatablesHelper(tableContainer, breakpointDefinition);
+          }
+        },
+          fnRowCallback: function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+          responsiveHelper.createExpandIcon(nRow);
+        },
+          fnDrawCallback: function (oSettings) {
+          responsiveHelper.respond();
+        }
+      });
     oTable.fnFilter('{{ search }}');
 });
 </script>

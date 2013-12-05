@@ -30,7 +30,7 @@
       <li><a href="{{ url_for('.view', vm_id=instance.id) }}">View</a></li>
       {% if 'dns' in config.installed_blueprints %}
         {% if instance.public %}
-        <li><a href="{{ url_for('dns_module.quick_register', domain=instance.domain, hostname=instance.hostname, ip=instance.public ) }}">Register in DNS</a></li>
+{#        <li><a href="{{ url_for('dns_module.quick_register', domain=instance.domain, hostname=instance.hostname, ip=instance.public ) }}">Register in DNS</a></li> #}
         {% endif %}
       {% endif %}
       {% if instance_active or instance.status == 'Stopped' %}

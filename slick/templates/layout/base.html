@@ -6,7 +6,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Bootstrap -->
-    <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link href="/static/css/dataTables.bootstrap.css" rel="stylesheet" media="screen">
     <link href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/2.0.1/css/toastr.min.css" rel="stylesheet" media="screen">
     <link href="//ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css" rel="stylesheet" media="screen">
     <link href="//code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" rel="stylesheet" media="screen">
@@ -70,12 +71,13 @@
     <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+    <script src="//ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js" type="text/javascript" charset="utf8"></script>
+    <script src="/static/js/dataTables.bootstrap.js"></script>
     <script src="/static/js/bootbox.min.js"></script>
     <script src="/static/js/parsley.min.js"></script>
     <script src="/static/js/core.js"></script>
     <!-- Toastr for notifications -->
     <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/2.0.0/js/toastr.min.js"></script>
-    <script src="//ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js" type="text/javascript" charset="utf8"></script>
 
     <script type="text/javascript">
     {% with errors = get_flashed_messages(category_filter=['error']) %}
@@ -95,7 +97,7 @@
 
     $(document).ready(function() {
         $.extend( $.fn.dataTable.defaults, {
-            "sPaginationType": "full_numbers",
+            "sPaginationType": "bootstrap",
           } );
 
         var cache = {};

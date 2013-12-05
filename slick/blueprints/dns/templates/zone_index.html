@@ -22,8 +22,8 @@
             Action <span class="caret"></span>
             </button>
             <ul class="dropdown-menu">
-              <li><a href="{{ url_for('.view', zone_id=zone.id) }}">View</a>
-{#              <li><a href="{{ url_for('.delete', zone_id=zone.id) }}" data-confirm="This will delete this zone and all associated records! Are you sure you want to continue?">Delete</a></li> #}
+              <li><a href="{{ url_for('.zone_view', zone_id=zone.id) }}">View</a>
+{#              <li><a href="{{ url_for('.zone_delete', zone_id=zone.id) }}" data-confirm="This will delete this zone and all associated records! Are you sure you want to continue?">Delete</a></li> #}
             </ul>
           </div>
         </td>

@@ -1,4 +1,4 @@
-from SoftLayer import DNSManager
+from SoftLayer import DNSManager, SoftLayerAPIError
 
 from slick.utils.core import get_client
 from slick.utils.date import parse_date
@@ -22,5 +22,43 @@ def all_zones():
     return zones
 
 
+def delete_record(record_id):
+    """ Deletes the specified record.
+
+    :param int record_id: The ID of the record being deleted.
+    """
+    try:
+        get_dns_manager().delete_record(record_id)
+        success = True
+        message = 'Record has been removed.'
+    except SoftLayerAPIError as exception:
+        success = False
+        message = str(exception)
+
+    return (success, message)
+
+
 def get_dns_manager():
     return DNSManager(get_client())
+
+
+def get_record(record_id):
+    api = get_client()['Dns_Domain_ResourceRecord']
+
+    try:
+        record = api.getObject(id=record_id, mask='domain')
+    except SoftLayerAPIError:
+        record = None
+
+    return record
+
+
+def get_zone(zone_id):
+    mgr = get_dns_manager()
+
+    try:
+        zone = mgr.get_zone(zone_id, records=True)
+    except SoftLayerAPIError:
+        zone = None
+
+    return zone

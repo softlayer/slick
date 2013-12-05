@@ -20,7 +20,15 @@ $(document).ready(function() {
         href = $(this).attr('href');
 	
         ev.preventDefault();
-        bootbox.confirm($(this).attr('data-confirm'), function(result) {
+	var message = '';
+
+	if ($(this).attr('data-title')) {
+	    message += "<h3 class='text-danger'>" + $(this).attr('data-title') + "</h3><br><br>"
+	}
+
+	message += $(this).attr('data-confirm');
+
+        bootbox.confirm(message, function(result) {
             if (result) {
                 window.location.replace(href);
             }

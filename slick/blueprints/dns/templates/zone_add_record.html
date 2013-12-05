@@ -1,0 +1,22 @@
+{% extends "layout/base.html" %}
+
+{% block content %}
+<form action="{{ url_for('.record_add', zone_id=zone.id) }}" method="post" id='zone_record_add_form' class="form-horizontal" role="form">
+  {{form.hidden_tag()}}
+
+  {{ helpers.field_enclosure(form.record(class="form-control"), label='Record', field_name='record', errors=form.record.errors, after='.'+zone.name) }}
+
+  {{ helpers.field_enclosure(form.type(class="form-control"), label='Type', field_name='type', errors=form.type.errors) }}
+
+  {{ helpers.field_enclosure(form.data(class="form-control"), label='Data', field_name='data', errors=form.data.errors) }}
+
+  {{ helpers.field_enclosure(form.ttl(class="form-control"), label='TTL', field_name='ttl', errors=form.ttl.errors, after='seconds') }}
+
+  <div class="form-group">
+    <div class="col-md-offset-2 col-md-10">
+      <button type="submit" class="btn btn-primary">Add Record</button>
+      <a href="{{ url_for('.index') }}" class="btn btn-default">Cancel</a>
+    </div>
+  </div>
+</form>
+{% endblock %}

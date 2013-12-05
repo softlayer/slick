@@ -39,5 +39,3 @@ class CreateMonthlyForm(Form):
         new_field = SelectField('Disk', validators=validators)
 
         cls.disks.append_entry(new_field)
-
-        print cls.disks

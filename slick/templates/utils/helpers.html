@@ -1,10 +1,15 @@
-{% macro field_enclosure(content, label='', field_name='', errors='') -%}
-  <div class="form-group">
+{% macro field_enclosure(content, label='', field_name='', errors='', after='') -%}
+  <div class="form-group row">
     {% if label %}
       <label for="{{ field_name }}" class="col-md-2 control-label">{{ label }}</label>
     {% endif %}
     <div class="col-md-4{% if errors %} has-error{% endif %}">
+      <div{% if after %} class="input-group"{% endif %}>
       {{ content }}
+      {% if after %}
+        <span class="input-group-addon">{{ after }}</span>
+      {% endif %}
+        </div>
       {% if errors and errors is iterable %}
       <span class="help-block">
         <ul class="list-unstyled">

@@ -12,15 +12,21 @@ submenu = [
 
 app.add_menu('right', submenu, 'Services', 2)
 
-# Key Delete
-#blueprint.add_url_rule('/delete/<int:key_id>', view_func=views.delete)
 
 # Zone List
 blueprint.add_url_rule('/', view_func=views.index)
 blueprint.add_url_rule('/index', view_func=views.index)
 
 # Zone View
-blueprint.add_url_rule('/view/<int:zone_id>', view_func=views.view)
+blueprint.add_url_rule('/view/<int:zone_id>', view_func=views.zone_view)
+
+# Record Add
+blueprint.add_url_rule('/record/add/<int:zone_id>', view_func=views.record_add,
+                       methods=['GET', 'POST'])
+
+# Record Delete
+blueprint.add_url_rule('/record/delete/<int:record_id>',
+                       view_func=views.record_delete)
 
 # Record Edit
-blueprint.add_url_rule('/record/<int:record_id>', view_func=views.edit_record)
+blueprint.add_url_rule('/record/<int:record_id>', view_func=views.record_edit)

@@ -1,4 +1,4 @@
-<table class="table">
+<table class="table no-datatable">
   <thead>
     <tr><th>Type</th><th>Active</th><th>Transaction</th><th>Down</th><th>Total</th></tr>
   </thead>
@@ -21,17 +21,3 @@
     {% endif %}
   </tbody>
 </table>
-{# 
-<div id="vm-widget-server-status">
-  
-</div>
-
-<script type="text/javascript">
-var serverStatusData = [
-  ['Status', 'Count'],
-  {% for status, count in statuses.items() %}
-    ['{{ status }}', {{ count }}],
-  {% endfor %}
-];
-</script>
-#}

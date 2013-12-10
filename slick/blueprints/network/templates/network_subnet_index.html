@@ -6,20 +6,20 @@
   <table class="table table-striped table-bordered" id="subnet_table">
     <thead>
       <tr>
-        <th>Identifier</th>
-        <th>Type</th>
-        <th>Datacenter</th>
-        <th>VLAN Number</th>
-        <th>IPs</th>
-        <th>VMs</th>
-        <th>Servers</th>
+        <th data-class="expand">Subnet</th>
+        <th data-hide="phone">Type</th>
+        <th data-hide="phone,plandscape">Datacenter</th>
+        <th data-hide="phone,plandscape">VLAN Number</th>
+        <th data-hide="phone,plandscape,tablet">IPs</th>
+        <th data-hide="phone,plandscape,tablet">VMs</th>
+        <th data-hide="phone,plandscape,tablet">Servers</th>
         <th>Actions</th>
       </tr>
     </thead>
     <tbody>
       {% for subnet in subnets %}
       <tr>
-        <td>{{ subnet.networkIdentifier }}</td>
+        <td>{{ subnet.networkIdentifier }}/{{ subnet.cidr }}</td>
         <td>{{ subnet.subnetType }}</td>
         <td>{{ subnet.datacenter.name }}</td>
         <td><a href="{{ url_for('network_module.vlan_index') }}?vlan={{ subnet.networkVlan.vlanNumber }}">{{ subnet.networkVlan.vlanNumber }}</a></td>
@@ -54,11 +54,7 @@
 {% block javascript %}
 <script type="text/javascript">
 $(document).ready(function() {
-    var oTable = $('#subnet_table').dataTable({
-        "aoColumnDefs": [
-          { "bSortable": false, "aTargets": [7] }
-        ],
-      });
+    var oTable = $('#subnet_table').dataTable();
     oTable.fnFilter('{{ search }}');
 });
 </script>

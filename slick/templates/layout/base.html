@@ -99,12 +99,33 @@
     {% endwith %}
 
     $(document).ready(function() {
-        $.extend( $.fn.dataTable.defaults, {
-            "sDom": '<"row"<"span6"l><"span6"f>r>t<"row"<"span6"i><"span6"p>>',
-            "sPaginationType": "bootstrap",
-            "bAutoWidth": false,
-          } );
+        var responsiveHelper;
+        var breakpointDefinition = {
+          phone: 320,
+          plandscape: 480,
+          smalltabportrait: 600,
+          tablet: 1024,
+        };
 
+        var tableElements = $('table:not(".no-datatable")');
+
+        tableElements.dataTable({
+            sPaginationType: 'bootstrap',
+            bAutoWidth     : false,
+            fnPreDrawCallback: function () {
+              // Initialize the responsive datatables helper once.
+              if (!this.responsiveHelper) {
+                this.responsiveHelper = new ResponsiveDatatablesHelper(this, breakpointDefinition);
+              }
+            },
+              fnRowCallback  : function (nRow) {
+              this.responsiveHelper.createExpandIcon(nRow);
+            },
+              fnDrawCallback : function (oSettings) {
+              this.responsiveHelper.respond();
+            }
+          });
+            
         var cache = {};
 
         $("#global_search").autocomplete({

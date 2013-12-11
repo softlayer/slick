@@ -1,0 +1,21 @@
+{% extends "layout/base.html" %}
+
+{% block content %}
+<form action="{{ url_for('.add') }}" method="post" id='key_add_form' class="form-horizontal" role="form">
+  {{form.hidden_tag()}}
+
+  {{ helpers.field_enclosure(form.label(class="form-control"), label='Label', field_name='label', errors=form.label.errors) }}
+
+  {{ helpers.field_enclosure(form.key(class="form-control"), label='Public Key', field_name='key', errors=form.key.errors) }}
+
+  {{ helpers.field_enclosure(form.notes(class="form-control"), label='Notes', field_name='notes', errors=form.notes.errors) }}
+
+  {# Submit Buttons #}
+  <div class="form-group">
+    <div class="col-md-offset-2 col-md-10">
+      <button type="submit" class="btn btn-primary">Add Key</button>
+      <a href="{{ url_for('.index') }}" class="btn btn-default">Cancel</a>
+    </div>
+  </div>
+</form>
+{% endblock %}

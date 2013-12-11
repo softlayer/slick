@@ -12,6 +12,9 @@ submenu = [
 
 app.add_menu('right', submenu, 'Services', 2)
 
+# Key Add
+blueprint.add_url_rule('/add', view_func=views.add, methods=['GET', 'POST'])
+
 # Key Delete
 blueprint.add_url_rule('/delete/<int:key_id>', view_func=views.delete)
 

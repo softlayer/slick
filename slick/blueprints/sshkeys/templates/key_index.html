@@ -25,7 +25,7 @@
             </button>
             <ul class="dropdown-menu">
               <li><a href="{{ url_for('.view', key_id=key.id) }}">View</a>
-              <li><a href="{{ url_for('.delete', key_id=key.id) }}" data-confirm="This will delete this SSH key! Are you sure you want to continue?">Delete</a></li>
+              <li><a href="{{ url_for('.delete', key_id=key.id) }}" data-title="{{ key.label }}" data-confirm="This will delete this SSH key! Are you sure you want to continue?">Delete</a></li>
             </ul>
           </div>
         </td>

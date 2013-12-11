@@ -1,3 +1,34 @@
 body { 
 /*    padding-top: 70px; */
 }
+
+.widget-width-small {
+/*    width: 300px; */
+    width: 25%;
+}
+
+.widget-width-medium {
+/*    width: 400px; */
+    width: 33.33333333333333%;
+}
+
+.widget-width-large {
+/*    width: 500px; */
+    width: 50%;
+}
+
+.widget-height-xsmall {
+    height: 150px;
+}
+
+.widget-height-small {
+    height: 300px;
+}
+
+.widget-height-medium {
+    height: 400px;
+}
+
+.widget-height-large {
+    height: 500px;
+}

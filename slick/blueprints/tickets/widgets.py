@@ -10,7 +10,8 @@ def get_widgets():
 
 class TicketDataWidget(object):
     def __init__(self):
-        self.css_class = 'col-md-4'
+        self.width = 'medium'
+        self.height = 'medium'
         self.javascript = ('ticket_module.static', 'js/stats_widget.js')
         self.title = 'Ticket Statistics'
 

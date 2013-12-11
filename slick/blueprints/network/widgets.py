@@ -11,7 +11,8 @@ def get_widgets():
 
 class NetworkSummaryWidget(object):
     def __init__(self):
-        self.css_class = 'col-md-6'
+        self.width = 'large'
+        self.height = 'large'
         self.no_body = True
         self.title = 'Network Summary by Datacenter'
 

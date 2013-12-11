@@ -49,7 +49,7 @@ def index():
     user = g.user
 
     widgets = []
-    for widget in app.widgets:
+    for widget in sorted(app.widgets):
         widgets.append(widget)
 
     return render_template("site_index.html", title='Home', user=user,

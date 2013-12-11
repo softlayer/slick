@@ -11,7 +11,8 @@ def get_widgets():
 
 class MQSummaryWidget(object):
     def __init__(self):
-        self.css_class = 'col-md-3'
+        self.width = 'small'
+        self.height = 'large'
         self.no_body = True
         self.title = 'Message Queue Summary'
 

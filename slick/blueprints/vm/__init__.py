@@ -22,6 +22,10 @@ blueprint.add_url_rule('/add', view_func=views.create,
 # VM Cancel
 blueprint.add_url_rule('/cancel/<int:vm_id>', view_func=views.cancel)
 
+# VM Edit
+blueprint.add_url_rule('/edit/<int:vm_id>', view_func=views.edit,
+                       methods=['GET', 'POST'])
+
 # VM List
 blueprint.add_url_rule('/', view_func=views.index)
 blueprint.add_url_rule('/index', view_func=views.index)

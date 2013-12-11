@@ -79,6 +79,34 @@ def cancel_instance(instance_id):
     return (success, message)
 
 
+def edit_instance(vm_id, hostname='', domain='', notes='', userdata=''):
+    """ This method wraps the CCIManager's edit() call.
+
+    :param string hostname: The new hostname for the VM.
+    :param string domain: The new domain for the VM.
+    :param string notes: Notes to set on the instance.
+    :param string userdata: User data to set on the VM.
+    """
+    instance = {
+        'id': vm_id,
+        'hostname': hostname,
+        'domain': domain,
+        'notes': notes,
+        'userdata': userdata,
+    }
+
+    try:
+        get_vm_manager().edit(**instance)
+        success = True
+        message = 'Edit instance successful. Please check your email ' \
+                  'for more information.'
+    except SoftLayerAPIError as exception:
+        success = False
+        message = str(exception)
+
+    return (success, message)
+
+
 def get_vm_manager():
     return CCIManager(get_client())
 
@@ -281,6 +309,8 @@ def _extract_instance_data(instance):
         'memory': instance.get('maxMemory', None),
         'active': active,
         'status': status,
+        'notes': instance.get('notes'),
+        'userdata': instance.get('userdata'),
     }
 
     os_block = lookup(instance, 'operatingSystem', 'softwareLicense',

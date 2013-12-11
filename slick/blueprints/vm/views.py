@@ -6,10 +6,10 @@ from flask import redirect, url_for, flash, request, render_template
 from slick.utils.core import get_client
 from slick.utils.nested_dict import lookup
 from slick.utils.session import login_required
-from .forms import CreateVMForm
+from .forms import CreateVMForm, EditVMForm
 from .manager import (all_instances, all_instance_options,
                       cancel_instance, change_port_speed,
-                      get_instance, launch_instance,
+                      edit_instance, get_instance, launch_instance,
                       reboot_instance, reload_instance,
                       validate_instance)
 
@@ -90,6 +90,46 @@ def create():
 
 
 @login_required
+def edit(vm_id):
+    instance = get_instance(vm_id)
+
+    if not instance:
+        flash('Invalid virtual machine specified.', 'error')
+        return redirect(url_for('.index'))
+
+    instance['vm_id'] = instance['id']
+
+    form = EditVMForm(**instance)
+
+    if form.validate_on_submit():
+        fields = {}
+        for field in form:
+            if 'csrf_token' == field.name:
+                continue
+
+            fields[field.name] = field.data
+
+        (success, message) = edit_instance(**fields)
+        if success:
+            flash(message, 'success')
+
+            return redirect(url_for(".index"))
+        else:
+            flash(message, 'error')
+
+    if form.errors:
+        flash('There are validation errors with your submission.', 'error')
+
+    payload = {
+        'title': 'Edit Instance',
+        'form': form,
+        'instance': instance,
+    }
+
+    return render_template('vm_edit.html', **payload)
+
+
+@login_required
 def get_password(object_id, username):
     """ This function is called via AJAX to retrieve the root/admin password
     for the specified machine and account.
@@ -125,10 +165,12 @@ def index():
     total_vms = total_vms.get('virtualGuestCount')
 
     instances = all_instances({})
-    payload = {}
-    payload['title'] = 'List Instances'
-    payload['instances'] = instances
-    payload['total_items'] = total_vms
+    payload = {
+        'title': 'List Instances',
+        'instances': instances,
+        'total_items': total_vms,
+        'submenu': [(url_for('.create'), 'Create Instance')],
+    }
 
     search = ''
 
@@ -210,10 +252,12 @@ def status(vm_id):
 def view(vm_id):
     instance = get_instance(vm_id)
 
-    payload = {}
-    payload['title'] = 'View VM'
-    payload['subheader'] = instance['fqdn']
-    payload['object'] = instance
-    payload['module'] = 'vm_module'
+    payload = {
+        'title': 'View VM',
+        'subheader': instance['fqdn'],
+        'object': instance,
+        'module': 'vm_module',
+        'submenu': [(url_for('.edit', vm_id=vm_id), 'Edit')],
+    }
 
     return render_template('shared/object_view.html', **payload)

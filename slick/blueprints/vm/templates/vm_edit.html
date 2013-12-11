@@ -1,0 +1,48 @@
+{% extends "layout/base.html" %}
+
+{% block content %}
+<form action="{{ url_for('.edit', vm_id=instance.id) }}" method="post" id='vm_edit_form' class="form-horizontal" role="form">
+  {{form.hidden_tag()}}
+
+  {# Hostname and Domain #}
+  <div class="form-group">
+    <label for="hostname" class="col-md-2 control-label">Name</label>
+    <div class="col-md-2{% if form.hostname.errors %} has-error{% endif %}">
+      {{form.hostname(class="form-control", autofocus=true, placeholder='Hostname')}}
+      {% if form.hostname.errors and form.hostname.errors is iterable %}
+      <span class="help-block">
+        <ul class="list-unstyled">
+          {% for error in form.hostname.errors %}
+          <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
+      </span>
+      {% endif %}
+    </div>
+    <div class="col-md-2{% if form.domain.errors %} has-error{% endif %}">
+      {{form.domain(class="form-control", placeholder='Domain')}}
+      {% if form.domain.errors and form.domain.errors is iterable %}
+      <span class="help-block">
+        <ul class="list-unstyled">
+          {% for error in form.domain.errors %}
+          <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
+      </span>
+      {% endif %}
+    </div>
+  </div>
+
+  {{ helpers.field_enclosure(form.notes(class="form-control"), label='Notes', field_name='notes', errors=form.notes.errors) }}
+
+  {{ helpers.field_enclosure(form.userdata(class="form-control"), label='User Data', field_name='userdata', errors=form.userdata.errors) }}
+
+  {# Submit Buttons #}
+  <div class="form-group">
+    <div class="col-md-offset-2 col-md-10">
+      <button type="submit" class="btn btn-primary">Update Instance</button>
+      <a href="{{ url_for('.index') }}" class="btn btn-default">Cancel</a>
+    </div>
+  </div>
+</form>
+{% endblock %}

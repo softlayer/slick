@@ -6,7 +6,7 @@ from wtformsparsleyjs import TextField, SelectField
 
 
 class ZoneRecordForm(Form):
-    zone_id = HiddenField(validators=[Required()])
+    zone_id = HiddenField()
     record = TextField('record', validators=[Required()])
     type = SelectField('type', choices=[('A', 'A'), ('AAAA', 'AAAA'),
                                         ('CNAME', 'CNAME'), ('TXT', 'TXT'),

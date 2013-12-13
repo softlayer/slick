@@ -35,3 +35,37 @@ def create_subnet(**kwargs):
 
 def get_network_manager():
     return NetworkManager(get_client())
+
+
+def get_subnet(subnet_id):
+    try:
+        subnet = get_network_manager().get_subnet(subnet_id)
+    except SoftLayerAPIError:
+        subnet = None
+
+    return subnet
+
+
+def get_vlan(vlan_id):
+    try:
+        vlan = get_network_manager().get_vlan(vlan_id)
+    except SoftLayerAPIError:
+        vlan = None
+
+    return vlan
+
+
+def list_subnets():
+    mask = [
+        'hardware',
+        'datacenter',
+        'ipAddressCount',
+        'virtualGuests',
+        'networkVlan',
+    ]
+
+    return get_network_manager().list_subnets(mask="mask[%s]" % ','.join(mask))
+
+
+def list_vlans():
+    return get_network_manager().list_vlans()

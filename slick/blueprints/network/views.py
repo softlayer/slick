@@ -1,16 +1,16 @@
 from flask import flash, redirect, render_template, request, url_for
 
-from SoftLayer import NetworkManager
-
-from slick.utils.core import get_client
 from slick.utils.session import login_required
-from .forms import CreateSubnetForm
-from .manager import cancel_subnet, create_subnet
+from . import forms, manager
 
 
 @login_required
 def subnet_cancel(subnet_id):
-    (success, message) = cancel_subnet(subnet_id)
+    """ This function cancels the specified subnet.
+
+    :param int subnet_id: The ID of the subnet to cancel
+    """
+    (success, message) = manager.cancel_subnet(subnet_id)
 
     category = 'error'
     if success:
@@ -22,16 +22,24 @@ def subnet_cancel(subnet_id):
 
 @login_required
 def subnet_create(vlan_id):
-    form = CreateSubnetForm()
+    """ Provides a form for creating a new subnet on a specified VLAN.
+
+    :param int vlan_id: The ID of the VLAN on which the subnet should reside.
+    """
+    form = forms.CreateSubnetForm()
     form.vlan_id.data = vlan_id
 
-    mgr = NetworkManager(get_client())
-    vlan = mgr.get_vlan(vlan_id)
+    vlan = manager.get_vlan(vlan_id)
 
-    payload = {}
-    payload['title'] = 'Create Subnet'
-    payload['subheader'] = 'VLAN ' + str(vlan['vlanNumber'])
-    payload['form'] = form
+    if not vlan:
+        flash('Invalid VLAN specified.', 'error')
+        return redirect(url_for('.subnet_index'))
+
+    payload = {
+        'title': 'Create Subnet',
+        'subheader': 'VLAN ' + str(vlan['vlanNumber']),
+        'form': form,
+    }
 
     if form.validate_on_submit():
         fields = {
@@ -48,28 +56,16 @@ def subnet_create(vlan_id):
         else:
             flash(message, 'error')
 
-    if form.errors:
-        flash('There are validation errors with your submission.', 'error')
-
     return render_template("network_subnet_create.html", **payload)
 
 
 @login_required
 def subnet_index():
-    mgr = NetworkManager(get_client())
-
-    mask = [
-        'hardware',
-        'datacenter',
-        'ipAddressCount',
-        'virtualGuests',
-        'networkVlan',
-    ]
-
-    payload = {}
-    payload['title'] = 'List Subnets'
-    payload['subnets'] = mgr.list_subnets(mask='mask[%s]' % ','.join(mask))
-
+    """ Displays a tabluar list of subnets on the user's account. """
+    payload = {
+        'title': 'List Subnets',
+        'subnets': manager.list_subnets(),
+    }
     search = ''
 
     if request.args.get('dc'):
@@ -84,24 +80,32 @@ def subnet_index():
 
 @login_required
 def subnet_view(subnet_id):
-    mgr = NetworkManager(get_client())
-    subnet = mgr.get_subnet(subnet_id)
+    """ Displays a detailed view of a single subnet.
 
-    payload = {}
-    payload['title'] = "View Subnet"
-    payload['subheader'] = subnet['networkIdentifier']
-    payload['subnet'] = subnet
+    :param int subnet_id: The ID of the subnet to display.
+    """
+    subnet = manager.get_subnet(subnet_id)
+
+    if not subnet:
+        flash('Invalid subnet specified.', 'error')
+        return redirect(url_for('.subnet_index'))
+
+    payload = {
+        'title': "View Subnet",
+        'subheader': subnet['networkIdentifier'],
+        'subnet': subnet,
+    }
 
     return render_template("network_subnet_view.html", **payload)
 
 
 @login_required
 def vlan_index():
-    mgr = NetworkManager(get_client())
-
-    payload = {}
-    payload['title'] = 'List VLANs'
-    payload['vlans'] = mgr.list_vlans()
+    """ Displays a tabular list of VLANs on the user's account. """
+    payload = {
+        'title': 'List VLANs',
+        'vlans': manager.list_vlans(),
+    }
 
     search = ''
 
@@ -117,12 +121,20 @@ def vlan_index():
 
 @login_required
 def vlan_view(vlan_id):
-    mgr = NetworkManager(get_client())
-    vlan = mgr.get_vlan(vlan_id)
+    """ Displays a detailed view of a specified VLAN.
 
-    payload = {}
-    payload['title'] = "View VLAN"
-    payload['subheader'] = 'VLAN ' + str(vlan['vlanNumber'])
-    payload['vlan'] = vlan
+    :param int vlan_id: The ID of the VLAN to display
+    """
+    vlan = manager.get_vlan(vlan_id)
+
+    if not vlan:
+        flash('Invalid VLAN specified.', 'error')
+        return redirect(url_for('.vlan_index'))
+
+    payload = {
+        'title': "View VLAN",
+        'subheader': 'VLAN ' + str(vlan['vlanNumber']),
+        'vlan': vlan,
+    }
 
     return render_template("network_vlan_view.html", **payload)

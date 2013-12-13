@@ -188,34 +188,3 @@
 {% endif %}
 
 {% endblock %}
-
-{% block javascript %}
-<script type="text/javascript">
-$(document).ready(function() {
-    {% if subnet.virtualGuests %}
-      {% if 'vm' in config.installed_blueprints %}
-        var vmConfig = {
-          "aoColumnDefs": [
-            { "bSortable": false, "aTargets": [3] }
-          ],
-        };
-      {% else %}
-        var vmConfig = {};
-      {% endif %}
-    $('#vm_table').dataTable(vmConfig);
-    {% endif %}
-    {% if subnet.hardware %}
-      {% if 'servers' in config.installed_blueprints %}
-        var serverConfig = {
-          "aoColumnDefs": [
-            { "bSortable": false, "aTargets": [3] }
-          ],
-        };
-      {% else %}
-        var serverConfig = {};
-      {% endif %}
-    $('#server_table').dataTable(serverConfig);
-    {% endif %}
-});
-</script>
-{% endblock %}

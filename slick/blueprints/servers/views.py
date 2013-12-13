@@ -7,11 +7,7 @@ from wtforms.validators import Required
 
 from slick.utils.nested_dict import lookup
 from slick.utils.session import login_required
-from .manager import (all_servers, get_hourly_create_options, get_server,
-                      place_order, verify_order, get_monthly_create_options,
-                      get_available_monthly_server_packages, reload_server,
-                      reboot_server)
-from .forms import CreateHourlyForm, CreateMonthlyForm
+from . import forms, manager
 
 
 @login_required
@@ -24,16 +20,19 @@ def change_nic_speed(object_id, nic, speed):
     :param int speed: The speed to change the interface to
     """
 
-    (success, message) = change_port_speed(object_id, nic, speed)
+    (success, message) = manager.change_port_speed(object_id, nic, speed)
     return json.dumps({'success': success, 'message': message})
 
 
 @login_required
 def create_hourly():
+    """ This presents a form for creating an hourly bare metal server,
+    previously known as a bare metal cloud (BMC).
+    """
     # Setup the form choices here since we need access to the client object
     # in order to do so.
-    form = CreateHourlyForm()
-    all_options = get_hourly_create_options('')
+    form = forms.CreateHourlyForm()
+    all_options = manager.get_hourly_create_options('')
 
     dc_options = []
     for dc in all_options['locations']:
@@ -50,10 +49,11 @@ def create_hourly():
     if form.validate_on_submit():
         fields = _extract_fields_from_form(form)
 
-        (success, message) = place_order(**fields)
+        (success, message) = manager.place_order(**fields)
         if success:
             flash(message, 'success')
 
+            # TODO - This isn't implemented yet
             if request.form.get('save_template'):
                 template_name = request.form.get('template_title')
 
@@ -75,17 +75,20 @@ def create_hourly():
 
 @login_required
 def create_monthly(package_id=None):
+    """ This presents a form for ordering a monthly dedicated server. """
+
+    # If we don't have a package ID yet, show the chassis selection page.
     if not package_id:
         payload = {}
         payload['title'] = 'Order Monthly Server - Select Chassis'
-        payload['options'] = get_available_monthly_server_packages()
+        payload['options'] = manager.get_available_monthly_server_packages()
 
         return render_template("server_monthly_add_package.html", **payload)
 
     payload = {}
-    form = CreateMonthlyForm(package_id=package_id)
+    form = forms.CreateMonthlyForm(package_id=package_id)
 
-    all_options = get_monthly_create_options('', package_id)
+    all_options = manager.get_monthly_create_options('', package_id)
 
     dc_options = []
     for dc in all_options['locations']:
@@ -127,10 +130,11 @@ def create_monthly(package_id=None):
     if form.validate_on_submit():
         fields = _extract_fields_from_form(form)
 
-        (success, message) = place_order(**fields)
+        (success, message) = manager.place_order(**fields)
         if success:
             flash(message, 'success')
 
+            # TODO - This is not implemented yet
             if request.form.get('save_template'):
                 template_name = request.form.get('template_title')
 
@@ -158,7 +162,7 @@ def get_password(object_id, username):
     :param string username: The specific admin account that owns the password.
     """
 
-    server = get_server(object_id, True)
+    server = manager.get_server(object_id, True)
 
     if not server:
         return 'Invalid account'
@@ -174,13 +178,21 @@ def get_password(object_id, username):
 
 @login_required
 def hard_reboot_server(server_id):
-    (success, message) = reboot_server(server_id, False)
+    """ AJAX call to hard reboot a server.
+
+    :param int vm_id: The ID of the server to reboot
+    """
+    (success, message) = manager.reboot_server(server_id, False)
     return json.dumps({'success': success, 'message': message})
 
 
 @login_required
 def index():
-    servers = all_servers()
+    """ Displays a list of all servers on the user's account. This includes
+    both hourly and monthly servers.
+    """
+
+    servers = manager.all_servers()
     payload = {}
     payload['title'] = 'List Servers'
     payload['servers'] = servers
@@ -197,15 +209,24 @@ def index():
 
 @login_required
 def price_check(server_type):
+    """ AJAX call to perform a price check on a new server order. It takes in
+    the entire server creation form, runs it through the validation API call,
+    and then returns the results for display.
+
+    :param string server_type: Used to determine if we're ordering an hourly or
+                               monthly server so the right form is loaded.
+    """
+
     if 'hourly' == server_type:
-        form = CreateHourlyForm()
+        form = forms.CreateHourlyForm()
     else:
-        form = CreateMonthlyForm()
+        # TODO - Don't I need a package ID here?
+        form = forms.CreateMonthlyForm()
 
     fields = _extract_fields_from_form(form)
 
     try:
-        results = verify_order(**fields)
+        results = manager.verify_order(**fields)
         return render_template('server_price_quote.html', type=server_type,
                                order_template=results)
     except SoftLayerAPIError as e:
@@ -215,22 +236,36 @@ def price_check(server_type):
 
 @login_required
 def server_reload(server_id):
-    (success, message) = reload_server(server_id)
+    """ AJAX call to reload a server.
+
+    :param int vm_id: The ID of the server to reload
+    """
+    (success, message) = manager.reload_server(server_id)
     return json.dumps({'success': success, 'message': message})
 
 
 @login_required
 def soft_reboot_server(server_id):
-    (success, message) = reboot_server(server_id)
+    """ AJAX call to soft reboot a server.
+
+    :param int vm_id: The ID of the server to reboot
+    """
+    (success, message) = manager.reboot_server(server_id)
     return json.dumps({'success': success, 'message': message})
 
 
 @login_required
 def status(server_id):
+    """ AJAX call to run a status check against a single server. This is used
+    with a Javascript timer to update the index for servers that have active
+    transactions.
+
+    :param int vm_id: The ID of the server you want the status for
+    """
     if not server_id:
         return None
 
-    server = get_server(server_id)
+    server = manager.get_server(server_id)
     html = render_template('server_instance_row.html', server=server)
 
     return json.dumps({
@@ -241,7 +276,11 @@ def status(server_id):
 
 @login_required
 def view(server_id):
-    server = get_server(server_id)
+    """ Provides a complete view page for a single server.
+
+    :param int vm_id: The ID of the server to view
+    """
+    server = manager.get_server(server_id)
 
     payload = {}
     payload['title'] = 'View Server'
@@ -253,6 +292,11 @@ def view(server_id):
 
 
 def _extract_fields_from_form(form):
+    """ Helper method for extracting fields from a form. This was created to
+    encapsulate repeated code.
+
+    :param object form: The wtform object being processed
+    """
     fields = {}
 
     for field in form:
@@ -274,13 +318,14 @@ def _extract_fields_from_form(form):
 
 
 def _process_category_items(options, category):
+    """ Helper method for setting up category items for form fields. This was
+    done to encapsulate repeated code.
+
+    :param dict options: The dictionary of options
+    :param string category: The category to extract from the options dictionary
+    """
     results = [('', '-- Select --')]
-#    previous_sort = None
     for item in options['categories'][category]['items']:
-#        if item['sort'] != previous_sort:
-#            if previous_sort is not None:
-#                results.append(('', '------'))
-#            previous_sort = item['sort']
         results.append((str(item['price_id']), item['description']))
     return results
     

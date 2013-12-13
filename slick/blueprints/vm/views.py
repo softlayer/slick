@@ -36,6 +36,8 @@ def cancel(vm_id):
 
 @login_required
 def create():
+    """ Provides an interface for creating a new virtual machine. """
+
     # Setup the form choices here since we need access to the client object
     # in order to do so.
     form = forms.CreateVMForm()
@@ -66,6 +68,7 @@ def create():
         if success:
             flash(message, 'success')
 
+            # TODO - This is not implemented yet
             if request.form.get('save_template'):
                 template_name = request.form.get('template_title')
 
@@ -86,6 +89,11 @@ def create():
 
 @login_required
 def edit(vm_id):
+    """ Provides an interface for a user to update some information about an
+    existing virtual machine.
+
+    :param int vm_id: The ID of the VM to edit
+    """
     instance = manager.get_instance(vm_id)
 
     if not instance:
@@ -149,12 +157,18 @@ def get_password(object_id, username):
 
 @login_required
 def hard_reboot_vm(vm_id):
+    """ AJAX call to hard reboot a VM.
+
+    :param int vm_id: The ID of the VM to reboot
+    """
     (success, message) = manager.reboot_instance(vm_id, False)
     return json.dumps({'success': success, 'message': message})
 
 
 @login_required
 def index():
+    """ This function creates a tabular list of all VMs on the user's account.
+    """
     instances = manager.all_instances()
     payload = {
         'title': 'List Instances',
@@ -174,6 +188,11 @@ def index():
 
 @login_required
 def price_check():
+    """ AJAX call to perform a price check on a new VM order. It takes in the
+    entire VM creation form, runs it through the validation API call, and then
+    returns the results for display.
+    """
+
     form = forms.CreateVMForm()
 
     fields = {}
@@ -191,36 +210,52 @@ def price_check():
 
 @login_required
 def reload_vm(vm_id):
+    """ AJAX call to reload a VM.
+
+    :param int vm_id: The ID of the VM to reload
+    """
     (success, message) = manager.reload_instance(vm_id)
     return json.dumps({'success': success, 'message': message})
 
 
 @login_required
 def soft_reboot_vm(vm_id):
+    """ AJAX call to soft reboot a VM.
+
+    :param int vm_id: The ID of the VM to reboot
+    """
     (success, message) = manager.reboot_instance(vm_id)
     return json.dumps({'success': success, 'message': message})
 
 
 @login_required
 def start_vm(vm_id):
+    """ AJAX call to start a halted VM.
+
+    :param int vm_id: The ID of the VM to start
+    """
     (success, message) = manager.start_vm(vm_id)
-    return json.dumps({
-        'success': success,
-        'message': message,
-    })
+    return json.dumps({'success': success, 'message': message})
 
 
 @login_required
 def stop_vm(vm_id):
+    """ AJAX call to stop a running VM.
+
+    :param int vm_id: The ID of the VM to stop
+    """
     (success, message) = manager.stop_vm(vm_id)
-    return json.dumps({
-        'success': success,
-        'message': message,
-    })
+    return json.dumps({'success': success, 'message': message})
 
 
 @login_required
 def status(vm_id):
+    """ AJAX call to run a status check against a single VM. This is used with
+    a Javascript timer to update the index for VMs that have active
+    transactions.
+
+    :param int vm_id: The ID of the VM you want the status for
+    """
     if not vm_id:
         return None
 
@@ -238,6 +273,10 @@ def status(vm_id):
 
 @login_required
 def view(vm_id):
+    """ Provides a complete view page for a single VM.
+
+    :param int vm_id: The ID of the VM to view
+    """
     instance = manager.get_instance(vm_id)
 
     payload = {

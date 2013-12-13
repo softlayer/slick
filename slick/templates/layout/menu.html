@@ -12,20 +12,7 @@
   <!-- Collect the nav links, forms, and other content for toggling -->
   <div class="collapse navbar-collapse navbar-ex1-collapse">
     <ul class="nav navbar-nav">
-      {% for endpoint, label, order in left_menu %}
-        {% if not endpoint is string %}
-          <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ label }} <b class="caret"></b></a>
-            <ul class="dropdown-menu">
-              {% for sub_endpoint, sub_label in endpoint %}
-                <li><a href="{{ url_for(sub_endpoint) }}">{{ sub_label }}</a></li>
-              {% endfor %}
-            </ul>
-          </li>
-        {% else  %}
-          <li{% if endpoint == request.endpoint %} class="active"{% endif %}><a href="{{ url_for(endpoint)}}">{{ label }}</a></li>
-        {% endif %}
-      {% endfor %}
+      {{ helpers.render_menu(left_menu) }}
     </ul>
 
     <form class="navbar-form navbar-left" role="search">
@@ -34,25 +21,11 @@
           <input type="text" id="global_search" class="form-control" placeholder="Search">
         </div>
       </div>
-      <button type="submit" class="btn btn-default">Submit</button>
+{#      <button type="submit" class="btn btn-default">Submit</button> #}
     </form>
 
     <ul class="nav navbar-nav navbar-right">
-      {% for endpoint, label, order in right_menu %}
-        {% if not endpoint is string %}
-          <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ label }} <b class="caret"></b></a>
-            <ul class="dropdown-menu">
-              {% for sub_endpoint, sub_label in endpoint %}
-                <li><a href="{{ url_for(sub_endpoint) }}">{{ sub_label }}</a></li>
-              {% endfor %}
-            </ul>
-          </li>
-        {% else  %}
-          <li{% if endpoint == request.endpoint %} class="active"{% endif %}><a href="{{ url_for(endpoint)}}">{{ label }}</a></li>
-        {% endif %}
-{#        <li{% if endpoint == request.endpoint %} class="active"{% endif %}><a href="{{ url_for(endpoint)}}">{{ label }}</a></li> #}
-      {% endfor %}
+      {{ helpers.render_menu(right_menu) }}
       <li class="dropdown">
         <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ g.user.username }} <b class="caret"></b></a>
         <ul class="dropdown-menu">
@@ -61,5 +34,5 @@
       </li>
       <li><a href="{{ url_for('site_module.logout') }}">Logout</a></li>
     </ul>
-  </div><!-- /.navbar-collapse -->
+  </div>
 </nav>

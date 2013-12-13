@@ -50,3 +50,33 @@
     <li class="disabled"><a href="#">Showing {{ (current_page-1) * config.PAGE_SIZE + 1 }} - {{ current_max }} of {{ total_items }}</a></li>
   </ul>
 {%- endmacro %}
+
+{% macro render_menu(menu) -%}
+  {% for items in menu %}
+    {% set endpoint = items[0] %}
+    {% set label = items[1] %}
+    {% if not endpoint is string %}
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ label }} <b class="caret"></b></a>
+        <ul class="dropdown-menu">
+          {% for sub_endpoint, sub_label in endpoint %}
+            {% if not sub_endpoint is string %}
+              <li class="dropdown-submenu">
+                <a href="#">{{ sub_label }}</a>
+                <ul class="dropdown-menu">
+                {% for level3_url, level3_label in sub_endpoint %}
+                  <li><a href="{{ url_for(level3_url) }}">{{ level3_label }}</a></li>
+                {% endfor %}
+                </ul>
+              </li>
+            {% else %}
+              <li><a href="{{ url_for(sub_endpoint) }}">{{ sub_label }}</a></li>
+            {% endif %}
+          {% endfor %}
+        </ul>
+      </li>
+    {% else  %}
+      <li{% if endpoint == request.endpoint %} class="active"{% endif %}><a href="{{ url_for(endpoint)}}">{{ label }}</a></li>
+    {% endif %}
+  {% endfor %}
+{%- endmacro %}

@@ -8,8 +8,10 @@ from . import views
 
 submenu = [
     ('server_module.index', 'List Servers'),
-    ('server_module.create_hourly', 'Create Hourly Bare Metal'),
-    ('server_module.create_monthly', 'Create Monthly Bare Metal'),
+    [[
+        ('server_module.create_hourly', 'Hourly'),
+        ('server_module.create_monthly', 'Monthly'),
+    ], "Create"],
 ]
 app.add_menu('left', submenu, 'Servers', 1)
 

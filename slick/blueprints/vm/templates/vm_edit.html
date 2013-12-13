@@ -33,9 +33,9 @@
     </div>
   </div>
 
-  {{ helpers.field_enclosure(form.notes(class="form-control"), label='Notes', field_name='notes', errors=form.notes.errors) }}
+  {{ helpers.field_enclosure(form.notes) }}
 
-  {{ helpers.field_enclosure(form.userdata(class="form-control"), label='User Data', field_name='userdata', errors=form.userdata.errors) }}
+  {{ helpers.field_enclosure(form.userdata) }}
 
   {# Submit Buttons #}
   <div class="form-group">

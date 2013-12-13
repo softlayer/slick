@@ -1,7 +1,17 @@
-{% macro field_enclosure(content, label='', field_name='', errors='', after='') -%}
+{% macro field_enclosure(field='', content='', label='', field_name='', errors='', after='', required=0) -%}
+  {% if field %}
+    {% set label=field.label %}
+    {% set field_name=field.name %}
+    {% set errors=field.errors %}
+    {% if field.flags %}
+      {% set required=field.flags.required %}
+    {% endif %}
+    {% set content=field(class="form-control") %}
+  {% endif %}
+
   <div class="form-group row">
     {% if label %}
-      <label for="{{ field_name }}" class="col-md-2 control-label">{{ label }}</label>
+      <label for="{{ field_name }}" class="col-md-2 control-label">{{ label }}{% if required %} *{% endif %}</label>
     {% endif %}
     <div class="col-md-4{% if errors %} has-error{% endif %}">
       <div{% if after %} class="input-group"{% endif %}>

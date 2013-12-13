@@ -34,28 +34,19 @@
     </div>
   </div>
 
-  {# Data Center #}
-  {{ helpers.field_enclosure(form.location(class="form-control"), label='Data Center', field_name='location', errors=form.location.errors) }}
-
-  {# CPUs #}
-  {{ helpers.field_enclosure(form.server(class="form-control"), label='CPU', field_name='server', errors=form.server.errors) }}
-
-  {# Memory #}
-  {{ helpers.field_enclosure(form.ram(class="form-control"), label='Memory', field_name='ram', errors=form.ram.errors) }}
-
-  {# Operating System #}
-  {{ helpers.field_enclosure(form.os(class="form-control"), label='Operating System', field_name='os', errors=form.os.errors) }}
-
-  {# NIC Speed #}
-  {{ helpers.field_enclosure(form.port_speed(class="form-control"), label='Network Speed', field_name='port_speed', errors=form.port_speed.errors) }}
+  {{ helpers.field_enclosure(form.location) }}
+  {{ helpers.field_enclosure(form.server) }}
+  {{ helpers.field_enclosure(form.ram) }}
+  {{ helpers.field_enclosure(form.os) }}
+  {{ helpers.field_enclosure(form.port_speed) }}
 
   <h4>Disks</h4>
-  {{ helpers.field_enclosure(form.disk_controller(class="form-control"), label='Disk Controller', field_name='disk_controller', errors=form.disk_controller.errors) }}
+  {{ helpers.field_enclosure(form.disk_controller) }}
 
   {# Disks #}
   {% set disk_count = 0 %}
   {% for entry in form.disks.entries %}
-    {{ helpers.field_enclosure(entry(class="form-control"), label='Disk ' + disk_count|string, field_name='disks[]', errors=form.disks.errors) }}
+    {{ helpers.field_enclosure(entry) }}
     {% set disk_count = disk_count + 1 %}
   {% endfor %}
 

@@ -6,8 +6,8 @@
 
   <p>Your account requires you to answer a security question in order to login. Please select one of the questions you have answered below.</p>
 
-  {{ helpers.field_enclosure(form.question_id(class="form-control"), label='Question', field_name='question_id', errors=form.question_id.errors) }}
-  {{ helpers.field_enclosure(form.answer(class="form-control"), label='Answer', field_name='answer', errors=form.answer.errors) }}
+  {{ helpers.field_enclosure(form.question_id) }}
+  {{ helpers.field_enclosure(form.answer) }}
   
   {# Submit Buttons #}
   <div class="form-group">

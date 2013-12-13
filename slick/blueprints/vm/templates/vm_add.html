@@ -34,16 +34,16 @@
   </div>
 
   {# Data Center #}
-  {{ helpers.field_enclosure(form.datacenter(class="form-control"), label='Data Center', field_name='datacenter', errors=form.datacenter.errors) }}
+  {{ helpers.field_enclosure(form.datacenter) }}
 
   {# Operating System #}
-  {{ helpers.field_enclosure(form.os(class="form-control"), label='Operating System', field_name='os', errors=form.os.errors) }}
+  {{ helpers.field_enclosure(form.os) }}
 
   {# CPUs #}
-  {{ helpers.field_enclosure(form.cpus(class="form-control"), label='CPUs', field_name='cpus', errors=form.cpus.errors) }}
+  {{ helpers.field_enclosure(form.cpus) }}
 
   {# RAM #}
-  {{ helpers.field_enclosure(form.memory(class="form-control"), label='Memory', field_name='memory', errors=form.memory.errors) }}
+  {{ helpers.field_enclosure(form.memory) }}
 
   {# NIC Speed #}
   <div class="form-group">

@@ -12,7 +12,7 @@ Please enter the code displayed on your Google authenticator.
 {% endif %}
 </p>
 
-  {{ helpers.field_enclosure(form.passcode(class="form-control"), label='Passcode', field_name='passcode', errors=form.passcode.errors) }}
+  {{ helpers.field_enclosure(form.passcode) }}
 
   {# Submit Buttons #}
   <div class="form-group">

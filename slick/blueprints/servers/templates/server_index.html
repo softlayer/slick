@@ -34,58 +34,18 @@
 
 {% block javascript %}
 <script type="text/javascript">
-var checkServers = false;
-var serverList = Array();
+var statusUrl = "{{ url_for('.status') }}";
+</script>
 
-setInterval(function() {
-    for (var i=0; i<serverList.length; i++) {
-      var serverId = serverList[i];
-      $.get("{{ url_for('server_module.status') }}/" + serverId).done(function(data) {
-          result = $.parseJSON(data);
-          $('#server_' + serverId).html(result.row_html);
-          if (result.active) {
-            var index = serverList.indexOf(serverId);
-            serverList.splice(index, 1);
-          }
-        });
-    }
-}, 5000);
+<script src="/static/js/shared_provision.js"></script>
+<script src="{{ url_for('.static', filename='js/server.js') }}"></script>
 
+<script type="text/javascript">
 {% if inactive_servers %}
 {% for id in inactive_servers %}
-serverList.push({{ id }});
+provisionList.push({{ id }});
 {% endfor %}
 {% endif %}
-
-function serverAction(serverId, action) {
-    var href = $('#' + action + '_' + serverId).attr('href')
-    if (action == 'reload') {
-      var message = 'This will erase the server and restore it to the base OS!';
-    } else if (action == 'soft_reboot') {
-      var message = 'This will attempt to reboot the server using the normal operating system method.';
-    } else if (action == 'hard_reboot') {
-      var message = 'This will simulate a power cycle of the server!';
-    } else {
-      var message = 'You are attempting to perform an unknown action.';
-    }
-
-    var hostname = $('#server_' + serverId).find('.server_hostname').html();
-    bootbox.confirm("<h3 class='text-danger'>" + hostname + "</h3>" + message + "<br><br>Are you sure you want to continue?", function(result) {
-        if (result) {
-          $.get(href).done(function(data) {
-              result = $.parseJSON(data);
-
-              var messageType = 'error';
-              if (result.success) {
-                messageType = 'success';
-                serverList.push(serverId);
-              }
-
-              add_notification(result.message, messageType);
-            });
-        }
-      }); 
-}
 
 $(document).ready(function() {
     var oTable = $('#server_table').dataTable();

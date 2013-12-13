@@ -4,7 +4,7 @@
 <form action="{{ action }}" method="post" id='zone_record_update_form' class="form-horizontal" role="form">
   {{form.hidden_tag()}}
 
-  {{ helpers.field_enclosure(form.record, after='.'+zone.name) }}
+  {{ helpers.field_enclosure(form.host, after='.'+zone.name) }}
 
   {{ helpers.field_enclosure(form.type) }}
 

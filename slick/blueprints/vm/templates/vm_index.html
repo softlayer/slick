@@ -21,7 +21,7 @@
       {% if (not instance.active or not instance.datacenter) and instance.status != 'Stopped' %}
         {% do inactive_vms.append(instance.id) %}
       {% endif %}
-    <tr id="vm_{{ instance.id }}">{% include 'vm_instance_row.html' %}</tr>
+    <tr id="provision_{{ instance.id }}">{% include 'vm_instance_row.html' %}</tr>
       {% endfor %}
   </tbody>
 </table>
@@ -36,66 +36,18 @@
 
 {% block javascript %}
 <script type="text/javascript">
-var checkVMs = false;
-var vmList = Array();
+var statusUrl = "{{ url_for('.status') }}";
+</script>
 
-setInterval(function() {
-    for (var i=0; i<vmList.length; i++) {
-      var vmId = vmList[i];
-      $.get("{{ url_for('vm_module.status') }}/" + vmId).done(function(data) {
-          result = $.parseJSON(data);
-          if (!result) {
-            $('#vm_' + vmId).remove();
-            vmList.splice(index, 1);
-          }
-          $('#vm_' + vmId).html(result.row_html);
-          if (result.active) {
-            var index = vmList.indexOf(vmId);
-            vmList.splice(index, 1);
-          }
-        });
-    }
-}, 5000);
+<script src="/static/js/shared_provision.js"></script>
+<script src="{{ url_for('.static', filename='js/vm.js') }}"></script>
 
+<script type="text/javascript">
 {% if inactive_vms %}
 {% for id in inactive_vms %}
-vmList.push({{ id }});
+provisionList.push({{ id }});
 {% endfor %}
 {% endif %}
-
-function vmAction(vmId, action) {
-    var href = $('#' + action + '_' + vmId).attr('href')
-    if (action == 'reload') {
-      var message = 'This will erase the VM and restore it to the base OS!';
-    } else if (action == 'soft_reboot') {
-      var message = 'This will attempt to reboot the VM using the normal operating system method.';
-    } else if (action == 'hard_reboot') {
-      var message = 'This will simulate a power cycle of the VM!';
-    } else if (action == 'cancel') {
-      var message = 'This will immediately cancel the VM, destroying all data on the system!';
-    } else if (action == 'stop') {
-      var message = 'This will stop the VM, prevending it from being used.';
-    } else {
-      var message = 'You are attempting to perform an unknown action.';
-    }
-
-    var hostname = $('#vm_' + vmId).find('.vm_hostname').html();
-    bootbox.confirm("<h3 class='text-danger'>" + hostname + "</h3>" + message + "<br><br>Are you sure you want to continue?", function(result) {
-        if (result) {
-          $.get(href).done(function(data) {
-              result = $.parseJSON(data);
-
-              var messageType = 'error';
-              if (result.success) {
-                messageType = 'success';
-                vmList.push(vmId);
-              }
-
-              add_notification(result.message, messageType);
-            });
-        }
-      }); 
-}
 
 $(document).ready(function() {
     var oTable = $('#vm_table').dataTable();

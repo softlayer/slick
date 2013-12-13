@@ -1,6 +1,6 @@
-from flask import redirect, url_for, flash, render_template
+import json
 
-from SoftLayer import DNSManager, SoftLayerAPIError
+from flask import redirect, url_for, flash, render_template
 from slick.utils.core import get_client
 from slick.utils.session import login_required
 
@@ -30,10 +30,67 @@ def index():
 
 
 @login_required
-def record_add(zone_id):
-    mgr = DNSManager(get_client())
+def quick_register(domain, hostname, ip):
+    """ This method attempts to immediately register the specified hostname in
+    the specified zone as an A record with a TTL of 3600.
 
-    zone = mgr.get_zone(zone_id, records=True)
+    :param string domain: The domain in which the record should be registered.
+    :param string hostname: The hostname for the new record.
+    :param string ip: The IP address to associate with the new record.
+    """
+    existing_record = manager.search_record(domain, hostname)
+
+    already_exists = False
+    success = True
+
+    # Check to see if the record already exists. This is a quick, slight weak
+    # attempt to avoid registering duplicate or conflicting records. If we want
+    # to support round robin A records, this code should be removed.
+    if existing_record:
+        if existing_record[0].get('data') == ip:
+            already_exists = 'Record already registered in DNS.'
+        elif existing_record[0].get('type') == 'a':
+            success = False
+            already_exists = 'Record registered with a different IP. Aborting.'
+        else:
+            success = False
+            already_exists = 'A non-A record already exists for this name.' \
+                             'Aborting.'
+
+    if already_exists:
+        return json.dumps({
+            'success': success,
+            'message': already_exists
+        })
+
+    domain_id = manager.get_zone_id_by_name(domain)
+    if not domain_id:
+        return json.dumps({
+            'success': False,
+            'message': 'Invalid domain specified.',
+        })
+
+    # Create the dictionary that will be used to create the new record.
+    # This method hardcodes some values to make the process a single click.
+    fields = {
+        'zone_id': domain_id,
+        'rec_type': 'A',
+        'host': hostname,
+        'data': ip,
+        'ttl': 3600,
+    }
+
+    (success, message) = manager.add_record(**fields)
+
+    return json.dumps({
+        'success': success,
+        'message': message,
+    })
+
+
+@login_required
+def record_add(zone_id):
+    zone = manager.get_zone(zone_id)
 
     if not zone:
         flash('DNS zone not found.', 'error')
@@ -49,7 +106,10 @@ def record_add(zone_id):
 
             fields[field.name] = field.data
 
-        mgr.create_record(**fields)
+        fields['rec_type'] = fields['type']
+        del(fields['type'])
+
+        manager.add_record(**fields)
 
         flash('Zone record created.', 'success')
         return redirect(url_for('.zone_view', zone_id=zone_id))
@@ -99,7 +159,6 @@ def record_edit(record_id):
 
     defaults = record
     defaults['zone_id'] = record['domain']['id']
-    defaults['record'] = record['host']
 
     form = ZoneRecordForm(**defaults)
 

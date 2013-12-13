@@ -26,7 +26,7 @@
       <li><a href="{{ url_for('.view', server_id=server.id) }}">View</a></li>
       {% if 'dns' in config.installed_blueprints %}
         {% if server.public %}
-{#        <li><a href="{{ url_for('dns_module.quick_register', domain=server.domain, hostname=server.hostname, ip=server.public ) }}">Register in DNS</a></li> #}
+        <li><a href="{{ url_for('dns_module.quick_register', domain=server.domain, hostname=server.hostname, ip=server.public ) }}" id="quick_{{ server.id }}" onclick="dnsRegister({{ server.id }}); return false;">Register in DNS</a></li>
         {% endif %}
       {% endif %}
       {% if server_active %}

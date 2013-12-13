@@ -1,7 +1,7 @@
 from flask import Blueprint
 
 blueprint = Blueprint('server_module', __name__, template_folder='templates',
-                      url_prefix='/server')
+                      static_folder='static', url_prefix='/server')
 
 from slick import app
 from . import views

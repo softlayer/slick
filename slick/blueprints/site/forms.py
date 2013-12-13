@@ -7,23 +7,24 @@ from wtformsparsleyjs import (TextField, PasswordField, BooleanField,
 
 
 class LoginForm(Form):
-    username = TextField('username', validators=[Required()])
-    password = PasswordField('password', validators=[Required()])
-    remember_me = BooleanField('remember_me', default=False)
+    username = TextField('Username', validators=[Required()])
+    password = PasswordField('Password', validators=[Required()])
+    remember_me = BooleanField('Remember Me', default=False)
 
 
 class ProfileForm(Form):
-    use_two_factor = RadioField(choices=[('none', 'No'), ('sms', 'SMS'),
+    use_two_factor = RadioField('Use Two Factor',
+                                choices=[('none', 'No'), ('sms', 'SMS'),
                                          ('authenticator',
                                           'Google Authenticator')],
                                 validators=[Required()])
-    phone_number = TelField('phone_number', validators=[Required()])
+    phone_number = TelField('Phone Number', validators=[Required()])
 
 
 class SecurityQuestionForm(Form):
-    question_id = SelectField('question_id')
-    answer = TextField('answer', validators=[Required()])
+    question_id = SelectField('Question', 'question_id')
+    answer = TextField('Answer', validators=[Required()])
 
 
 class TwoFactorForm(Form):
-    passcode = TextField('passcode', validators=[Required()])
+    passcode = TextField('Passcode', validators=[Required()])

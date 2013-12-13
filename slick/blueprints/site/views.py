@@ -11,16 +11,11 @@ from flask import (g, redirect, url_for, flash, request, render_template,
                    session, Response)
 from flask.ext.login import login_user, logout_user
 
-from SoftLayer import (Client, SoftLayerAPIError, CCIManager, HardwareManager,
-                       SshKeyManager)
-
 from slick import app, db, lm
-from .forms import LoginForm, ProfileForm, SecurityQuestionForm, TwoFactorForm
-from .models import User
 from slick.utils.core import get_client
 from slick.utils.session import login_required
-
 from slick.utils.nexmomessage import NexmoMessage
+from . import forms, manager, models
 
 try:
     from twilio import TwilioRestException
@@ -59,10 +54,10 @@ def index():
 def login():
     if g.user is not None and g.user.is_authenticated():
         return redirect(url_for('.index'))
-    form = LoginForm()
+    form = forms.LoginForm()
     if form.validate_on_submit():
-        auth = _authenticate_with_password(form.username.data,
-                                           form.password.data)
+        auth = manager.authenticate_with_password(form.username.data,
+                                                  form.password.data)
         if not auth:
             flash('Invalid credentials, please try again.', 'error')
             return logout()
@@ -98,13 +93,13 @@ def logout():
 
 @lm.user_loader
 def load_user(id):
-    return User.query.get(int(id))
+    return models.User.query.get(int(id))
 
 
 @login_required
 def profile():
     user = g.user
-    form = ProfileForm(request.form, user)
+    form = forms.ProfileForm(request.form, user)
     if form.validate_on_submit():
         user.use_two_factor = form.use_two_factor.data
         user.phone_number = form.phone_number.data
@@ -126,53 +121,7 @@ def search():
     if not request.args.get('term'):
         return ''
 
-    match_string = '<span class="text-primary">%s</span>' % \
-                   request.args.get('term')
-    term = re.compile(request.args.get('term'), re.IGNORECASE)
-
-    results = []
-
-    client = get_client()
-#    hostname_regex = re.compile('\w')
-
-    if 'vm' in app.config['installed_blueprints']:
-        cci = CCIManager(client)
-#        if hostname_regex.match(term):
-        for vm in cci.list_instances():
-            if term.match(vm['hostname']) or \
-               term.match(vm.get('primaryIpAddress', '')):
-                text = '%s (%s)' % (vm['fullyQualifiedDomainName'],
-                                    vm.get('primaryIpAddress', 'No Public IP'))
-                text = term.sub(match_string, text)
-
-                results.append({'label': '<strong>VM:</strong> ' + text,
-                                'value': url_for('vm_module.view',
-                                                 vm_id=vm['id'])})
-    if 'servers' in app.config['installed_blueprints']:
-        hw = HardwareManager(client)
-
-        for svr in hw.list_hardware():
-            if term.match(svr['hostname']) or \
-               term.match(svr.get('primaryIpAddress', '')):
-                text = '%s (%s)' % (svr['fullyQualifiedDomainName'],
-                                    svr.get('primaryIpAddress',
-                                            'No Public IP'))
-                text = term.sub(match_string, text)
-
-                results.append({'label': '<strong>Server:</strong> ' + text,
-                                'value': url_for('server_module.view',
-                                                 server_id=svr['id'])})
-    if 'sshkeys' in app.config['installed_blueprints']:
-        ssh = SshKeyManager(client)
-
-        for key in ssh.list_keys():
-            if term.match(key['label']) or term.match(key['fingerprint']):
-                text = '%s (%s)' % (key['label'], key['fingerprint'])
-                text = term.sub(match_string, text)
-
-                results.append({'label': '<strong>SSH Key:</strong> ' + text,
-                                'value': url_for('ssh_module.view',
-                                                 key_id=key['id'])})
+    results = manager.global_search(request.args.get('term'))
 
     return json.dumps(results)
 
@@ -186,8 +135,8 @@ def security_question():
     elif session.get('security_question_answered'):
         return redirect(url_for('.index'))
 
-    form = SecurityQuestionForm()
-    questions = get_client()['User_Security_Question'].getAllObjects()
+    form = forms.SecurityQuestionForm()
+    questions = manager.get_questions()
 
     choices = []
     for q in questions:
@@ -201,10 +150,10 @@ def security_question():
     }
 
     if form.validate_on_submit():
-        auth = _authenticate_with_password(session['un'],
-                                           session['pw'],
-                                           form.question_id.data,
-                                           form.answer.data)
+        auth = manager.authenticate_with_password(session['un'],
+                                                  session['pw'],
+                                                  form.question_id.data,
+                                                  form.answer.data)
 
         if auth and auth != 'security_question':
             session['security_question_answered'] = True
@@ -236,7 +185,7 @@ def two_factor_login():
               'success')
         return redirect(url_for('.index'))
 
-    form = TwoFactorForm()
+    form = forms.TwoFactorForm()
     payload = {
         'title': 'Two-Factor Authentication',
         'form': form,
@@ -268,26 +217,6 @@ def two_factor_login():
     return render_template('site_two_factor.html', **payload)
 
 
-def _authenticate_with_password(username, password, question_id=None,
-                                answer=None):
-    client = Client()
-    try:
-        (user_id, user_hash) = client.authenticate_with_password(username,
-                                                                 password,
-                                                                 question_id,
-                                                                 answer)
-        session['sl_user_id'] = user_id
-        session['sl_user_hash'] = user_hash
-    except SoftLayerAPIError as e:
-        c = 'SoftLayer_Exception_User_Customer_InvalidSecurityQuestionAnswer'
-        if e.faultCode == c:
-            return 'security_question'
-
-        return False
-
-    return True
-
-
 def _check_two_factor(user):
     session['use_two_factor'] = True
     session['two_factor_passed'] = False
@@ -313,9 +242,9 @@ def _perform_login(username, remember):
         flash('Invalid credentials, please try again.', 'error')
         return logout()
 
-    user = User.query.filter_by(username=username).first()
+    user = models.User.query.filter_by(username=username).first()
     if user is None:
-        user = User(username=username)
+        user = models.User(username=username)
         db.session.add(user)
         db.session.commit()
     login_user(user, remember=remember)
@@ -338,7 +267,7 @@ def _send_passcode(passcode):
         if app.config.get('TWILIO_AUTH_TOKEN'):
             f_number = random.choice(app.config['TWILIO_FROM_NUMBERS'])
             client = TwilioRestClient(app.config['TWILIO_ACCOUNT_SID'],
-                                      _app.config['TWILIO_AUTH_TOKEN'])
+                                      app.config['TWILIO_AUTH_TOKEN'])
             if user.use_two_factor == 'sms':
                 try:
                     success = True

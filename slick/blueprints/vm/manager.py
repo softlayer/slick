@@ -32,11 +32,14 @@ def all_instance_options(username):
     return results
 
 
-def all_instances(instance_filter):
+def all_instances(instance_filter=None):
     """ This method will retrieve all CloudCompute instances and return
     them as a list.
     """
     instances = []
+
+    if not instance_filter:
+        instance_filter = {}
 
     for instance in get_vm_manager().list_instances(**instance_filter):
         instances.append(_extract_instance_data(instance))
@@ -56,7 +59,7 @@ def change_port_speed(instance_id, nic, speed):
                   "to take effect"
     except SoftLayerAPIError as exception:
         success = False
-        message = str(exception)
+        message = str(exception.message)
 
     return (success, message)
 
@@ -74,7 +77,7 @@ def cancel_instance(instance_id):
                   'more information.'
     except SoftLayerAPIError as exception:
         success = False
-        message = str(exception)
+        message = str(exception.message)
 
     return (success, message)
 
@@ -102,7 +105,7 @@ def edit_instance(vm_id, hostname='', domain='', notes='', userdata=''):
                   'for more information.'
     except SoftLayerAPIError as exception:
         success = False
-        message = str(exception)
+        message = str(exception.message)
 
     return (success, message)
 
@@ -155,7 +158,7 @@ def launch_instance(hostname, domain, os, cpus, memory, network, datacenter=''):
                   'for more information.'
     except SoftLayerAPIError as exception:
         success = False
-        message = str(exception)
+        message = str(exception.message)
 
     return (success, message)
 
@@ -177,7 +180,7 @@ def reboot_instance(instance_id, soft=True):
         message = 'Reboot request sent to instance.'
     except SoftLayerAPIError as exception:
         success = False
-        message = str(exception)
+        message = str(exception.message)
 
     return (success, message)
 
@@ -195,7 +198,43 @@ def reload_instance(instance_id):
                   'the reload is complete.'
     except SoftLayerAPIError as exception:
         success = False
-        message = str(exception)
+        message = str(exception.message)
+
+    return (success, message)
+
+
+def start_vm(instance_id):
+    """ Starts a halted virtual machine.
+
+    :param int instance_id: The ID of the virtual machine to start.
+    """
+    vg_client = get_client()['Virtual_Guest']
+
+    try:
+        vg_client.powerOn(id=instance_id)
+        success = True
+        message = 'Instance is being started.'
+    except SoftLayerAPIError as exception:
+        success = False
+        message = str(exception.message)
+
+    return (success, message)
+
+
+def stop_vm(instance_id):
+    """ Stops a running virtual machine.
+
+    :param int instance_id: The ID of the virtual machine to stop.
+    """
+    vg_client = get_client()['Virtual_Guest']
+
+    try:
+        vg_client.powerOff(id=instance_id)
+        success = True
+        message = 'Instance is being stopped.'
+    except SoftLayerAPIError as exception:
+        success = False
+        message = str(exception.message)
 
     return (success, message)
 

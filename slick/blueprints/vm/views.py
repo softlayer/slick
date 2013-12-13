@@ -6,12 +6,7 @@ from flask import redirect, url_for, flash, request, render_template
 from slick.utils.core import get_client
 from slick.utils.nested_dict import lookup
 from slick.utils.session import login_required
-from .forms import CreateVMForm, EditVMForm
-from .manager import (all_instances, all_instance_options,
-                      cancel_instance, change_port_speed,
-                      edit_instance, get_instance, launch_instance,
-                      reboot_instance, reload_instance,
-                      validate_instance)
+from . import forms, manager
 
 
 @login_required
@@ -24,7 +19,7 @@ def change_nic_speed(object_id, nic, speed):
     :param int speed: The speed to change the interface to
     """
 
-    (success, message) = change_port_speed(object_id, nic, speed)
+    (success, message) = manager.change_port_speed(object_id, nic, speed)
     return json.dumps({'success': success, 'message': message})
 
 
@@ -35,7 +30,7 @@ def cancel(vm_id):
     :param int vm_id: The ID of the instance to change
     """
 
-    (success, message) = cancel_instance(vm_id)
+    (success, message) = manager.cancel_instance(vm_id)
     return json.dumps({'success': success, 'message': message})
 
 
@@ -43,8 +38,8 @@ def cancel(vm_id):
 def create():
     # Setup the form choices here since we need access to the client object
     # in order to do so.
-    form = CreateVMForm()
-    all_options = all_instance_options('')
+    form = forms.CreateVMForm()
+    all_options = manager.all_instance_options('')
 
     dc_options = [('', 'First Available')]
     dc_options += all_options['datacenter']
@@ -67,7 +62,7 @@ def create():
 
             fields[field.name] = field.data
 
-        (success, message) = launch_instance(**fields)
+        (success, message) = manager.launch_instance(**fields)
         if success:
             flash(message, 'success')
 
@@ -91,7 +86,7 @@ def create():
 
 @login_required
 def edit(vm_id):
-    instance = get_instance(vm_id)
+    instance = manager.get_instance(vm_id)
 
     if not instance:
         flash('Invalid virtual machine specified.', 'error')
@@ -99,7 +94,7 @@ def edit(vm_id):
 
     instance['vm_id'] = instance['id']
 
-    form = EditVMForm(**instance)
+    form = forms.EditVMForm(**instance)
 
     if form.validate_on_submit():
         fields = {}
@@ -109,7 +104,7 @@ def edit(vm_id):
 
             fields[field.name] = field.data
 
-        (success, message) = edit_instance(**fields)
+        (success, message) = manager.edit_instance(**fields)
         if success:
             flash(message, 'success')
 
@@ -138,7 +133,7 @@ def get_password(object_id, username):
     :param string username: The specific admin account that owns the password.
     """
 
-    instance = get_instance(object_id, True)
+    instance = manager.get_instance(object_id, True)
 
     if not instance:
         return 'Invalid account'
@@ -154,21 +149,16 @@ def get_password(object_id, username):
 
 @login_required
 def hard_reboot_vm(vm_id):
-    (success, message) = reboot_instance(vm_id, False)
+    (success, message) = manager.reboot_instance(vm_id, False)
     return json.dumps({'success': success, 'message': message})
 
 
 @login_required
 def index():
-    account_obj = get_client()['Account']
-    total_vms = account_obj.getCurrentUser(mask='mask[id,virtualGuestCount]')
-    total_vms = total_vms.get('virtualGuestCount')
-
-    instances = all_instances({})
+    instances = manager.all_instances()
     payload = {
         'title': 'List Instances',
         'instances': instances,
-        'total_items': total_vms,
         'submenu': [(url_for('.create'), 'Create Instance')],
     }
 
@@ -184,7 +174,7 @@ def index():
 
 @login_required
 def price_check():
-    form = CreateVMForm()
+    form = forms.CreateVMForm()
 
     fields = {}
 
@@ -195,39 +185,37 @@ def price_check():
         if request.form.get(field.name):
             fields[field.name] = request.form[field.name]
 
-    results = validate_instance(**fields)
+    results = manager.validate_instance(**fields)
     return render_template('vm_price_quote.html', order_template=results)
 
 
 @login_required
 def reload_vm(vm_id):
-    (success, message) = reload_instance(vm_id)
+    (success, message) = manager.reload_instance(vm_id)
     return json.dumps({'success': success, 'message': message})
 
 
 @login_required
 def soft_reboot_vm(vm_id):
-    (success, message) = reboot_instance(vm_id)
+    (success, message) = manager.reboot_instance(vm_id)
     return json.dumps({'success': success, 'message': message})
 
 
 @login_required
 def start_vm(vm_id):
-    vg_client = get_client()['Virtual_Guest']
-    vg_client.powerOn(id=vm_id)
+    (success, message) = manager.start_vm(vm_id)
     return json.dumps({
-        'success': True,
-        'message': 'Instance is being started.'
+        'success': success,
+        'message': message,
     })
 
 
 @login_required
 def stop_vm(vm_id):
-    vg_client = get_client()['Virtual_Guest']
-    vg_client.powerOff(id=vm_id)
+    (success, message) = manager.stop_vm(vm_id)
     return json.dumps({
-        'success': True,
-        'message': 'Instance is being stopped.'
+        'success': success,
+        'message': message,
     })
 
 
@@ -236,7 +224,7 @@ def status(vm_id):
     if not vm_id:
         return None
 
-    instance = get_instance(vm_id)
+    instance = manager.get_instance(vm_id)
     if not instance:
         return ''
 
@@ -250,7 +238,7 @@ def status(vm_id):
 
 @login_required
 def view(vm_id):
-    instance = get_instance(vm_id)
+    instance = manager.get_instance(vm_id)
 
     payload = {
         'title': 'View VM',

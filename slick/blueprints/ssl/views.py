@@ -1,29 +1,31 @@
 from flask import redirect, url_for, flash, render_template
 
-from SoftLayer import SSLManager
-
-from slick.utils.core import get_client
 from slick.utils.session import login_required
+from . import manager
+
+
+@login_required
+def add():
+    pass
 
 
 @login_required
 def delete(cert_id):
-    mgr = SSLManager(get_client())
+    (success, message) = manager.delete_cert(cert_id)
 
-    mgr.remove_certificate(cert_id)
-
-    flash("SSL certificate deleted.", 'success')
+    if success:
+        flash(message, 'success')
+    else:
+        flash(message, 'error')
 
     return redirect(url_for('.index'))
 
 
 @login_required
 def index():
-    mgr = SSLManager(get_client())
-
     payload = {
         'title': 'List SSL Certificates',
-        'certs': mgr.list_certs(),
+        'certs': manager.list_certs(),
     }
 
     return render_template("cert_index.html", **payload)
@@ -31,9 +33,7 @@ def index():
 
 @login_required
 def view(cert_id):
-    mgr = SSLManager(get_client())
-
-    cert = mgr.get_certificate(cert_id)
+    cert = manager.get_cert(cert_id)
 
     if not cert:
         flash('SSL certificate not found.', 'error')

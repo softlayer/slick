@@ -1,6 +1,7 @@
 *.py[cod]
 newrelic.ini
 config.py
+fabfile.py
 
 # C extensions
 *.so

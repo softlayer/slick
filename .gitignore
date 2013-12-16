@@ -1,4 +1,5 @@
 *.py[cod]
+newrelic.ini
 config.py
 
 # C extensions

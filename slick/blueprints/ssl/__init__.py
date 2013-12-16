@@ -10,7 +10,7 @@ submenu = [
     ('ssl_module.index', 'SSL Certs'),
 ]
 
-app.add_menu('right', submenu, 'Services', 2)
+app.add_menu('left', submenu, 'Services', 4)
 
 # Cert Delete
 blueprint.add_url_rule('/delete/<int:cert_id>', view_func=views.delete)

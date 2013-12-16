@@ -10,8 +10,7 @@ submenu = [
     ('dns_module.index', 'Zone Management'),
 ]
 
-app.add_menu('right', submenu, 'Services', 2)
-
+app.add_menu('left', submenu, 'Services', 4)
 
 # Zone List
 blueprint.add_url_rule('/', view_func=views.index)

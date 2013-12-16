@@ -41,7 +41,7 @@
     {% block css %}{% endblock %}
   </head>
   <body>
-    <div class="container">
+    <div class="container" style="padding-top: 5px">
     {# Menu #}
     {% if g.user.is_authenticated() %}
       {% include 'layout/menu.html' %}

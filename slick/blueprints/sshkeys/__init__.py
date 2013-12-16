@@ -10,7 +10,7 @@ submenu = [
     ('ssh_module.index', 'SSH Keys'),
 ]
 
-app.add_menu('right', submenu, 'Services', 2)
+app.add_menu('left', submenu, 'Services', 4)
 
 # Key Add
 blueprint.add_url_rule('/add', view_func=views.add, methods=['GET', 'POST'])

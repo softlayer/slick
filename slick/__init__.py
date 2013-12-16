@@ -2,10 +2,9 @@ import importlib
 from os import listdir
 from os.path import dirname, abspath, join, isdir, exists
 
-from flask import Flask, g, session
+from flask import Flask, g
 from flask.ext.login import LoginManager, current_user
 from flask.ext.sqlalchemy import SQLAlchemy
-#from flask_debugtoolbar import DebugToolbarExtension
 
 twilio_enabled = True
 try:
@@ -67,9 +66,6 @@ db = SQLAlchemy(app)
 lm = LoginManager()
 lm.init_app(app)
 lm.login_view = 'site_module.login'
-
-# Enable the debug toolbar
-# toolbar = DebugToolbarExtension(app)
 
 # Load all of our blueprints
 BLUEPRINT_PATH = app.config.get('BLUEPRINT_PATH',

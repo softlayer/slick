@@ -7,10 +7,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Bootstrap -->
     <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet" media="screen">
-    <link href="/static/css/dataTables.bootstrap.css" rel="stylesheet" media="screen">
-    <link href="/static/css/datatables.responsive.css" rel="stylesheet" media="screen">
     <link href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/2.0.1/css/toastr.min.css" rel="stylesheet" media="screen">
     <link href="//ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css" rel="stylesheet" media="screen">
+    <link href="/static/css/dataTables.bootstrap.css" rel="stylesheet" media="screen">
+    <link href="/static/css/datatables.responsive.css" rel="stylesheet" media="screen">
     <link href="//code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" rel="stylesheet" media="screen">
 {# @TODO - Figure out where these come from
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -35,7 +35,7 @@
       height: 200px;
     }
     .ui-autocomplete-loading {
-      background: white url('/static/img/ajax-loader.gif') right center no-repeat;
+      background: white url('/static/images/ajax-loader.gif') right center no-repeat;
     }
     </style>
     {% block css %}{% endblock %}
@@ -106,9 +106,17 @@
           smalltabportrait: 600,
           tablet: 1024,
         };
-
+        
         var tableElements = $('table:not(".no-datatable")');
+        var extensions = {
+          sFilter: "dataTables_filter form-group",
+        }
 
+        // Used when bJQueryUI is false
+        $.extend($.fn.dataTableExt.oStdClasses, extensions);
+        // Used when bJQueryUI is true
+        $.extend($.fn.dataTableExt.oJUIClasses, extensions);
+        
         tableElements.dataTable({
             sPaginationType: 'bootstrap',
             bAutoWidth     : false,
@@ -126,6 +134,18 @@
             }
           });
             
+        $('.dataTables_filter').each(function() {
+            $(this).find('input').addClass('form-control');
+            $(this).find('label').addClass('control-label');
+//            $(this).addClass('form-control');
+          });
+
+        $('.dataTables_length').each(function() {
+            $(this).find('select').addClass('form-control');
+            $(this).find('label').addClass('control-label');
+//            $(this).addClass('form-control');
+          });
+
         var cache = {};
 
         $("#global_search").autocomplete({

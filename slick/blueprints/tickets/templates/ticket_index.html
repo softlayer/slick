@@ -2,28 +2,26 @@
 
 {% block content %}
 {% if tickets %}
-<div class="table-responsive">
-  <table class="table table-striped table-bordered" id="ticket_table">
-    <thead>
-      <tr>
-        <th data-class="expand">Title</th>
-        <th data-hide="phone">Category</th>
-        <th data-hide="phone">Created</th>
-        <th data-hide="phone">Status</th>
-      </tr>
-    </thead>
-    <tbody>
+<table class="table table-striped table-bordered" id="ticket_table">
+  <thead>
+    <tr>
+      <th data-class="expand">Title</th>
+      <th data-hide="phone">Category</th>
+      <th data-hide="phone">Created</th>
+      <th data-hide="phone">Status</th>
+    </tr>
+  </thead>
+  <tbody>
       {% for ticket in tickets|sort(attribute='title') %}
-      <tr>
-        <td><a href="https://manage.softlayer.com/Support/editTicket/{{ ticket.id }}">{{ ticket.title }}</a></td>
-        <td>{{ ticket.group.name }}</td>
-        <td>{{ parse_date(ticket.createDate) }}</td>
-        <td>{{ ticket.status.name }}</td>
-      </tr>
+    <tr>
+      <td><a href="https://manage.softlayer.com/Support/editTicket/{{ ticket.id }}">{{ ticket.title }}</a></td>
+      <td>{{ ticket.group.name }}</td>
+      <td>{{ parse_date(ticket.createDate) }}</td>
+      <td>{{ ticket.status.name }}</td>
+    </tr>
       {% endfor %}
-    </tbody>
-  </table>
-</div>
+  </tbody>
+</table>
 {% else %}
 <div class="panel panel-danger">
   <div class="panel-heading">Error</div>

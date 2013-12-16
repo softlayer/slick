@@ -10,6 +10,13 @@ body {
 .dropdown-submenu:hover>a:after{border-left-color:#ffffff;}
 .dropdown-submenu.pull-left{float:none;}.dropdown-submenu.pull-left>.dropdown-menu{left:-100%;margin-left:10px;-webkit-border-radius:6px 0 6px 6px;-moz-border-radius:6px 0 6px 6px;border-radius:6px 0 6px 6px;}
 
+table.dataTable tr.odd td.sorting_1 { background-color: #f9f9f9; !important }
+table.dataTable tr.odd td.sorting_2 { background-color: #f9f9f9; !important }
+table.dataTable tr.odd td.sorting_3 { background-color: #f9f9f9; !important }
+table.dataTable tr.even td.sorting_1 { background-color: white; }
+table.dataTable tr.even td.sorting_2 { background-color: white; }
+table.dataTable tr.even td.sorting_3 { background-color: white; }
+
 .widget-width-small {
 /*    width: 300px; */
     width: 25%;

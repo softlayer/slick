@@ -90,7 +90,7 @@ $('#price_submit').click(function(event) {
     
     if (valid) {
       div = $('#price_div');
-      div.html('<img src="/static/img/ajax-loader.gif" alt="Loading Price Quote"> Getting Quote');
+      div.html('<img src="/static/images/ajax-loader.gif" alt="Loading Price Quote"> Getting Quote');
       $.post('{{ url_for('.price_check') }}', $('#vm_add_form').serialize()).done(function(data) { div.html(data) });
     }
 });

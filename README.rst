@@ -3,9 +3,12 @@ Slick
 
 Slick is a reference implementation for using the `SoftLayer Python Bindings <https://github.com/softlayer/softlayer-api-python-client>`_. It implements a small web portal using a variety of open source projects to show the type of application you can build with the bindings.
 
+.. WARNING::
+   This software is currently in active development. Some expertise is required for initial installation and setup.
+
 Installation
 ------------
-To be completed
+Instructions will be added in January 2014.
 
 System Requirements
 -------------------

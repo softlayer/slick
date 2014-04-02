@@ -47,8 +47,16 @@ def create():
     dc_options += all_options['datacenter']
     form.datacenter.choices = dc_options
 
-    os_options = [('', '-- Select --')] + all_options['os']
-    form.os.choices = os_options
+    os_groups = {}
+    for os in all_options['os']:
+        group = os[0].split('_')[0].lower()
+        if group not in os_groups:
+            os_groups[group] = []
+        os_groups[group].append(os)
+
+    form.os.choices = all_options['os']
+#    os_options = [('', '-- Select --')] + all_options['os']
+#    form.os.choices = os_options
 
     cpu_options = [('', '-- Select --')] + all_options['cpus']
     form.cpus.choices = cpu_options
@@ -84,7 +92,19 @@ def create():
     if form.errors:
         flash('There are validation errors with your submission.', 'error')
 
-    return render_template('vm_add.html', title='Create Instance', form=form)
+    os_names = {
+        'centos': 'CentOS',
+        'vyattace': 'Vyatta CE',
+        'win': 'Windows',
+    }
+
+    payload = {
+        'title': 'Create Instance',
+        'form': form,
+        'os_groups': os_groups,
+        'os_names': os_names,
+    }
+    return render_template('vm_add.html', **payload)
 
 
 @login_required

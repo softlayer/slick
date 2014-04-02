@@ -34,36 +34,82 @@
   </div>
 
   {# Data Center #}
-  {{ helpers.field_enclosure(form.datacenter) }}
+  <div class="form-group">
+    <label class="col-md-2 control-label">Data Center</label>
+    <div class="col-md-6 btn-group" data-toggle="buttons">
+      {%- for dc in form.datacenter %}
+      {% if dc.data %}
+      <label class="btn btn-primary{% if dc.data == form.datacenter.data %} active{% endif %}">
+        <input type="radio" name="{{ dc.name }}" id="{{ dc.id }}" value="{{ dc.data }}"{% if dc.data == form.datacenter.data %} checked{% endif %}> {{ dc.data }}
+      </label>
+      {% endif %}
+      {% endfor -%}
+    </div>
+    {% if form.datacenter.errors and form.datacenter.errors is iterable %}
+    <span class="help-block">
+      <ul class="list-unstyled">
+        {% for error in form.datacenter.errors %}
+        <li>{{ error }}</li>
+        {% endfor %}
+      </ul>
+    </span>
+    {% endif %}
+  </div>
 
   {# Operating System #}
-  {{ helpers.field_enclosure(form.os) }}
+  <div class="form-group">
+    <label class="col-md-2 control-label">Operating System</label>
+    <div class="col-md-8">
+      <ul class="nav nav-tabs">
+        {% for group in os_groups.keys()|sort %}
+        {% set title = os_names[group]|default(group.title()) %}
+        <li><a href="#os-{{ group }}" data-toggle="tab"><img src="/static/images/{{ group }}_logo.png" alt="{{ title }}" title="{{ title }}"></a></li>
+        {% endfor %}
+      </ul>
+      <div class="tab-content">
+        {% for group, options in os_groups.items()|sort %}
+        <div class="tab-pane btn-group" id="os-{{ group }}" data-toggle="buttons">
+          {% for value, text in options %}
+          <label class="btn {% if value == form.os.data %} active{% endif %}">
+            <input type="radio" name="os" id="os-{{ group }}-{{ value }}" class="radio-button" value="{{ value }}"{% if value == form.os.data %} checked{% endif %}> <span class="tooltip-trigger" data-toggle="tooltip" title="{{ text }}">{{ text|truncate(40, True) }}</span>
+          </label>
+          {% endfor %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
 
   {# CPUs #}
-  {{ helpers.field_enclosure(form.cpus) }}
+{#  {{ helpers.field_enclosure(form.cpus) }} #}
+  <div class="form-group">
+    <label class="col-md-2 control-label">CPU</label>
+    <div id="cpu-slider" class="col-md-4"></div>
+    <div class="col-md-2" id="cpu-amount"></div>
+  </div>
 
   {# RAM #}
   {{ helpers.field_enclosure(form.memory) }}
 
   {# NIC Speed #}
   <div class="form-group">
-    <label for="network" class="col-md-2 control-label">Network</label>
-    <div class="col-md-4{% if form.network.errors %} has-error{% endif %}">
-      {% for option in form.network %}
-        <label class="radio-inline">
-          <input type="radio" name="{{ option.name }}" id="{{ option.id }}" value="{{ option.data }}"{% if option.checked %} checked{% endif %}> {{ option.label }}
-        </label>
-      {% endfor %}
-      {% if form.network.errors and form.network.errors is iterable %}
-      <span class="help-block">
-        <ul class="list-unstyled">
-          {% for error in form.network.errors %}
-          <li>{{ error }}</li>
-          {% endfor %}
-        </ul>
-      </span>
-      {% endif %}
+    <label class="col-md-2 control-label">Network Speed</label>
+    <div class="col-md-4 btn-group" data-toggle="buttons">
+      {%- for option in form.network %}
+      <label class="btn btn-primary{% if option.data == form.network.data %} active{% endif %}">
+        <input type="radio" name="{{ option.name }}" id="{{ option.id }}" value="{{ option.data }}"{% if option.data == form.network.data %} checked{% endif %}> {{ option.data }} Mbps
+      </label>
+      {% endfor -%}
     </div>
+    {% if form.network.errors and form.network.errors is iterable %}
+    <span class="help-block">
+      <ul class="list-unstyled">
+        {% for error in form.network.errors %}
+        <li>{{ error }}</li>
+        {% endfor %}
+      </ul>
+    </span>
+    {% endif %}
   </div>
 
   <div class="row">
@@ -91,7 +137,7 @@ $('#price_submit').click(function(event) {
     if (valid) {
       div = $('#price_div');
       div.html('<img src="/static/images/ajax-loader.gif" alt="Loading Price Quote"> Getting Quote');
-      $.post('{{ url_for('.price_check') }}', $('#vm_add_form').serialize()).done(function(data) { div.html(data) });
+      $.post('{{ url_for(".price_check") }}', $('#vm_add_form').serialize()).done(function(data) { div.html(data) });
     }
 });
 
@@ -102,5 +148,32 @@ $('.form-control').change(function() {
 $('input[type=radio]').change(function() {
     $('#price_div').html('');
 });
+
+$('.radio-button').change(function() {
+    $('.radio-button').each(function() {
+        $(this).parent().removeClass('btn-primary');
+    });
+
+    $(this).parent().addClass('btn-primary');
+});
+
+$('.tooltip-trigger').tooltip();
+
+var cpuCounts = [0, 1, 2, 4, 8, 12, 16];
+
+$('#cpu-slider').slider({
+{#    {% if form.cpus.data != none %}value: {{ form.cpus.data }},{% endif %} #}
+    min: 1,
+    max: {{ form.cpus.choices|length - 1 }},
+    slide: function( event, ui ) {
+      var message = cpuCounts[ui.value] + " CPU";
+      if (ui.value > 1) { message += "s"; }
+      $( "#cpu-amount" ).html( message );
+    },
+  });
+    var cpuValue = $("#cpu-slider").slider("value");
+    var message = cpuCounts[cpuValue] + " CPU";
+    if (cpuValue > 1) { message += "s"; }
+    $( "#cpu-amount" ).html( message );
 </script>
 {% endblock %}

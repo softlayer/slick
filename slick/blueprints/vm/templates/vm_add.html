@@ -81,15 +81,24 @@
   </div>
 
   {# CPUs #}
-{#  {{ helpers.field_enclosure(form.cpus) }} #}
+  {% set default_cpu = 1 %}
+  {% if form.cpus.data|int %}{% set default_cpu = form.cpus.data|int %}{% endif %}
   <div class="form-group">
     <label class="col-md-2 control-label">CPU</label>
     <div id="cpu-slider" class="col-md-4"></div>
-    <div class="col-md-2" id="cpu-amount"></div>
+    <div class="col-md-2" id="cpu-amount">{{ default_cpu }} CPU{% if default_cpu > 1 %}s{% endif %}</div>
+    <input type="hidden" id="cpus" name="cpus" value="{{ default_cpu }}">
   </div>
 
   {# RAM #}
-  {{ helpers.field_enclosure(form.memory) }}
+  {% set default_memory = 1024 %}
+  {% if form.memory.data|int %}{% set default_memory = form.memory.data|int %}{% endif %}
+  <div class="form-group">
+    <label class="col-md-2 control-label">Memory</label>
+    <div id="memory-slider" class="col-md-4"></div>
+    <div class="col-md-2" id="memory-amount">{{ (default_memory / 1024)|int }} GB</div>
+    <input type="hidden" id="memory" name="memory" value="{{ default_memory }}">
+  </div>
 
   {# NIC Speed #}
   <div class="form-group">
@@ -159,21 +168,28 @@ $('.radio-button').change(function() {
 
 $('.tooltip-trigger').tooltip();
 
-var cpuCounts = [0, 1, 2, 4, 8, 12, 16];
+var cpuCounts = [0, {% for cpu in form.cpus %}{% if cpu.data %}{{ cpu.data }}, {% endif %}{% endfor %}];
+var memoryCounts = [0, {% for memory in form.memory %}{% if memory.data %}{{ memory.data }}, {% endif %}{% endfor %}];
 
 $('#cpu-slider').slider({
-{#    {% if form.cpus.data != none %}value: {{ form.cpus.data }},{% endif %} #}
     min: 1,
     max: {{ form.cpus.choices|length - 1 }},
     slide: function( event, ui ) {
       var message = cpuCounts[ui.value] + " CPU";
       if (ui.value > 1) { message += "s"; }
-      $( "#cpu-amount" ).html( message );
+      $("#cpu-amount").html( message );
+      $("#cpus").val(cpuCounts[ui.value]);
     },
   });
-    var cpuValue = $("#cpu-slider").slider("value");
-    var message = cpuCounts[cpuValue] + " CPU";
-    if (cpuValue > 1) { message += "s"; }
-    $( "#cpu-amount" ).html( message );
+
+$('#memory-slider').slider({
+    min: 1,
+    max: {{ form.memory.choices|length - 1 }},
+    slide: function( event, ui ) {
+      var message = memoryCounts[ui.value] / 1024 + " GB";
+      $("#memory-amount").html( message );
+      $("#memory").val(memoryCounts[ui.value]);
+    },
+  });
 </script>
 {% endblock %}

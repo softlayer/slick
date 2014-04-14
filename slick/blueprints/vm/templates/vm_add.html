@@ -60,7 +60,7 @@
   <div class="form-group">
     <label class="col-md-2 control-label">Operating System</label>
     <div class="col-md-8">
-      <ul class="nav nav-tabs">
+      <ul class="nav nav-pills">
         {% for group in os_groups.keys()|sort %}
         {% set title = os_names[group]|default(group.title()) %}
         <li><a href="#os-{{ group }}" data-toggle="tab"><img src="/static/images/{{ group }}_logo.png" alt="{{ title }}" title="{{ title }}"></a></li>

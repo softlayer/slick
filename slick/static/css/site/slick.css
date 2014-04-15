@@ -47,3 +47,7 @@ table.dataTable tr.even td.sorting_3 { background-color: white; }
 .widget-height-large {
     height: 500px;
 }
+
+div.tooltip-inner {
+    max-width: 350px;
+}

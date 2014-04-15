@@ -52,7 +52,14 @@ def create():
         group = os[0].split('_')[0].lower()
         if group not in os_groups:
             os_groups[group] = []
-        os_groups[group].append(os)
+
+        # Name cleanup to help with display
+        name = os[1]
+        bad_strings = [' GNU/Linux', ' Install', '/Stable', ' Linux']
+        for string in bad_strings:
+            name = name.replace(string, '')
+
+        os_groups[group].append((os[0], name))
 
     form.os.choices = all_options['os']
 #    os_options = [('', '-- Select --')] + all_options['os']

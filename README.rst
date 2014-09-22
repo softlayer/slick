@@ -8,7 +8,7 @@ Slick is a reference implementation for using the `SoftLayer Python Bindings <ht
 
 Installation
 ------------
-Instructions will be added in January 2014.
+Instructions will be added in Winter 2014.
 
 System Requirements
 -------------------

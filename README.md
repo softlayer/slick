@@ -8,12 +8,12 @@ Slick is a reference implementation for using the `SoftLayer Python Bindings <ht
 
 Installation
 ------------
-#### Prerequirements
+**Prerequirements**
 ```bash
 apt-get install libpq-dev postgresql python-pip git python-dev
 ```
 
-#### DB Setup
+**DB Setup**
 I'm using postgresql, but you can use mysql if you like. Just change the bindings in alembic.ini and config.py
 ```bash
 su postgresql
@@ -22,7 +22,7 @@ create user slick with password 'slick1234';
 create database slick owner slick;
 ```
 
-#### Get everything running
+**Get everything running**
 If you used a better password than slick1234 make sure you change alembic.ini and config.py after you clone the repo
 
 ```bash
@@ -43,7 +43,7 @@ This will start the web server on port 5000
 ```bash
 python run.py
 ```
-Then just head over to http://<hostname>:5000 and you should be able to login with your SoftLayer portal username and password.
+Then just head over to http://hostname:5000 and you should be able to login with your SoftLayer portal username and password.
 To run the server as a daemon just add the & symbol to the end of that command. There is currently no init script or anything fancy like that.
 
 I'll leave seting up nginx as an excersize for the reader.

@@ -1,14 +1,14 @@
 from flask.ext.wtf import Form
 from wtforms import FieldList, HiddenField
 from wtforms.validators import Required
-from wtformsparsleyjs import TextField, SelectField
+from wtformsparsleyjs import StringField, SelectField
 
 
 class CreateHourlyForm(Form):
     bare_metal = HiddenField(default='1')
     location = SelectField('Data Center', default='FIRST_AVAILABLE')
-    hostname = TextField('Hostname', validators=[Required()])
-    domain = TextField('Domain', validators=[Required()])
+    hostname = StringField('Hostname', validators=[Required()])
+    domain = StringField('Domain', validators=[Required()])
     server = SelectField('Server', validators=[Required()])
     os = SelectField('Operating System', validators=[Required()])
     port_speed = SelectField('Network Speed', validators=[Required()])
@@ -20,8 +20,8 @@ class CreateHourlyForm(Form):
 class CreateMonthlyForm(Form):
     package_id = HiddenField(validators=[Required()])
     location = SelectField('Data Center', default='FIRST_AVAILABLE')
-    hostname = TextField('Hostname', validators=[Required()])
-    domain = TextField('Domain', validators=[Required()])
+    hostname = StringField('Hostname', validators=[Required()])
+    domain = StringField('Domain', validators=[Required()])
     server = SelectField('CPU', validators=[Required()])
     ram = SelectField('Memory', validators=[Required()])
     os = SelectField('Operating System', validators=[Required()])

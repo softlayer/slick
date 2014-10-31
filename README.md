@@ -11,22 +11,12 @@ Installation
 **Prerequirements**
 
 ```bash
-apt-get install libpq-dev postgresql python-pip git python-dev
-```
-
-**DB Setup**
-
-I'm using postgresql, but you can use mysql if you like. Just change the bindings in alembic.ini and config.py
-```bash
-su postgresql
-pgsql
-create user slick with password 'slick1234';
-create database slick owner slick;
+apt-get install libpq-dev sqlite3 python-pip git python-dev
 ```
 
 **Get everything running**
 
-If you used a better password than slick1234 make sure you change alembic.ini and config.py after you clone the repo
+If you don't want to have everything in /usr/local/slick make sure to change alembic.ini and config.py
 
 ```bash
 cd /usr/local/

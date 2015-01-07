@@ -33,22 +33,22 @@
     </div>
   </div>
 
-{# Tags #}
-<div class="form-group">
-<label for="tags" class="col-md-2 control-label">Tags</label>
-<div class="col-md-4{% if form.tags.errors %} has-error{% endif %}">
-{{form.tags(class="form-control", placeholder='Tags must be separated by a comma (Ex: tag1,tag2)')}}
-{% if form.tags.errors and form.tags.errors is iterable %}
-<span class="help-block">
-<ul class="list-unstyled">
-{% for error in form.tags.errors %}
-<li>{{ error }}</li>
-{% endfor %}
-</ul>
-</span>
-{% endif %}
-</div>
-</div>
+  {# Tags #}
+  <div class="form-group">
+  <label for="tags" class="col-md-2 control-label">Tags</label>
+  <div class="col-md-2{% if form.tags.errors %} has-error{% endif %}">
+    {{form.tags(class="form-control", placeholder='Tags (Ex: tag1,tag2)')}}
+    {% if form.tags.errors and form.tags.errors is iterable %}
+      <span class="help-block">
+          <ul class="list-unstyled">
+          {% for error in form.tags.errors %}
+          <li>{{ error }}</li>
+          {% endfor %}
+          </ul>
+      </span>
+  {% endif %}
+  </div>
+  </div>
 
   {# Data Center #}
   <div class="form-group">

@@ -130,7 +130,7 @@ def get_instance(instance_id, full_data=False):
     return instance
 
 
-def launch_instance(hostname, domain, os, cpus, memory, network, tags, datacenter=''):
+def launch_instance(hostname, domain, os, cpus, memory, network, tags='', datacenter=''):
     """ This method wraps the CCIManager's create_instance() call.
 
     :param string datacenter: The datacenter in which to spin up the new VM.
@@ -352,6 +352,7 @@ def _extract_instance_data(instance):
         'status': status,
         'notes': instance.get('notes'),
         'userdata': instance.get('userdata'),
+        'tags': instance.get('tags'),
     }
 
     os_block = lookup(instance, 'operatingSystem', 'softwareLicense',

@@ -13,7 +13,7 @@ class CreateVMForm(Form):
     memory = SelectField('Memory (GB)', validators=[Required()])
     network = RadioField(choices=[('10', '10Mbps'), ('100', '100Mbps'),
                                   ('1000', '1000 Mbps')])
-    tag = StringField('Tag')
+    tags = StringField('Tags')
 
 
 class EditVMForm(Form):

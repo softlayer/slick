@@ -130,7 +130,7 @@ def get_instance(instance_id, full_data=False):
     return instance
 
 
-def launch_instance(hostname, domain, os, cpus, memory, network, tags, datacenter=''):
+def launch_instance(hostname, domain, os, cpus, memory, network, tag='', datacenter=''):
     """ This method wraps the CCIManager's create_instance() call.
 
     :param string datacenter: The datacenter in which to spin up the new VM.
@@ -150,7 +150,7 @@ def launch_instance(hostname, domain, os, cpus, memory, network, tags, datacente
         'cpus': cpus,
         'memory': memory,
         'nic_speed': network,
-        'tags': tags
+        'tags': tag
     }
 
     try:

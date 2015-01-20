@@ -33,15 +33,15 @@
     </div>
   </div>
 
-  {# Tags #}
+  {# Tag #}
   <div class="form-group">
-  <label for="tags" class="col-md-2 control-label">Tags</label>
-  <div class="col-md-2{% if form.tags.errors %} has-error{% endif %}">
-    {{form.tags(class="form-control", placeholder='Tags (Ex: tag1,tag2)')}}
-    {% if form.tags.errors and form.tags.errors is iterable %}
+  <label for="tag" class="col-md-2 control-label">Tags</label>
+  <div class="col-md-2{% if form.tag.errors %} has-error{% endif %}">
+    {{form.tag(class="form-control", placeholder='Tags (Ex: tag1,tag2)')}}
+    {% if form.tag.errors and form.tag.errors is iterable %}
       <span class="help-block">
           <ul class="list-unstyled">
-          {% for error in form.tags.errors %}
+          {% for error in form.tag.errors %}
           <li>{{ error }}</li>
           {% endfor %}
           </ul>

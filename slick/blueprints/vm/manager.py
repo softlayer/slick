@@ -338,6 +338,20 @@ def _extract_instance_data(instance):
         active = True
         status = 'Running'
 
+    tagReferencesList = instance.get('tagReferences', None)
+    if not tagReferencesList:
+        tag = 'None'
+    else:
+        tagsReference = tagReferencesList[0]
+        tags = tagsReference.get('tag')
+        tag = tags.get('name')
+        x = 1
+        while (x < len(tagReferencesList)):
+            tagsReference = tagReferencesList[x]
+            tags = tagsReference.get('tag')
+            tag = tag + ', ' + tags.get('name')
+            x = x + 1
+        
     return_data = {
         'id': instance.get('id', None),
         'hostname': instance.get('hostname'),
@@ -352,7 +366,7 @@ def _extract_instance_data(instance):
         'status': status,
         'notes': instance.get('notes'),
         'userdata': instance.get('userdata'),
-        'tags': instance.get('tags'),
+        'tags': tag
     }
 
     os_block = lookup(instance, 'operatingSystem', 'softwareLicense',

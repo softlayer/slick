@@ -44,7 +44,7 @@ class Slick(Flask):
 
 # Setup the main Flask app
 app = Slick(__name__)
-app.config.from_pyfile('config.py', silent=True)
+app.config.from_envvar('SLICK_CONFIG_FILE')
 app.static_folder = join(dirname(abspath(__file__)), "static")
 app.static_url_path = "/static/"
 app.jinja_env.add_extension('jinja2.ext.do')

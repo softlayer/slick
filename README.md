@@ -8,7 +8,7 @@ Slick is a reference implementation for using the `SoftLayer Python Bindings <ht
 
 Installation
 ------------
-**Prerequirements**
+### Prerequirements
 Starting with a fresh install of Ubuntu 14.04-64
 ```bash
 apt-get install libpq-dev sqlite3 python-pip git python-dev
@@ -17,10 +17,10 @@ pip install flask
 pip install six --upgrade
 ```
 
-**Get everything running**
+### Get everything running
 
-If you don't want to have everything in /usr/local/slick make sure to change alembic.ini and config.py
 
+#### Getting the code
 ```bash
 cd /usr/local/
 git clone https://github.com/softlayer/slick.git
@@ -30,17 +30,22 @@ python setup.py install
 If setup.py failed to install, make sure you install any missing packages and try again before continuing. Usually the setup will complain about a missing package, so just use pip to install or upgrade it, and you should be ok.
 
 
-This will setup the database
+#### Setup the database
 ```bash
 alembic upgrade head   
 ```
 
+
+#### Configuration
 Then you need to setup the config file. Just copy it to config.py, end edit the 2 secret strings. You can switch DB providers, but I would recommend sticking with sqlite for now.
+
+If you don't want to have everything in /usr/local/slick make sure to change alembic.ini and config.py
 ```bash
 cp config.py.sample slick/config.py
 ```
 
 
+#### Finally running
 This will start the web server on port 5000
 ```bash
 python run.py

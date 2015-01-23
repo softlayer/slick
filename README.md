@@ -41,7 +41,7 @@ Then you need to setup the config file. Just copy it to config.py, end edit the 
 
 If you don't want to have everything in /usr/local/slick make sure to change alembic.ini and config.py
 ```bash
-cp config.py.example config.py
+cp config.py.sample config.py
 export SLICK_CONFIG_FILE=/usr/local/slick/config.py
 ```
 You will need to either add SLICK_CONFIG_FILE to your bashrc, or export it everytime you reboot.

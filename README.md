@@ -37,14 +37,14 @@ alembic upgrade head
 
 
 #### Configuration
-Then you need to setup the config file. Just copy it to config.py, end edit the 2 secret strings. You can switch DB providers, but I would recommend sticking with sqlite for now.
+Then you need to setup the config file. Just copy it to config.py, and edit the 2 secret strings. 
 
 If you don't want to have everything in /usr/local/slick make sure to change alembic.ini and config.py
 ```bash
 cp config.py.sample config.py
 export SLICK_CONFIG_FILE=/usr/local/slick/config.py
 ```
-You will need to either add SLICK_CONFIG_FILE to your bashrc, or export it everytime you reboot.
+You will need to either add SLICK_CONFIG_FILE to your bashrc, or export it every time you reboot.
 
 #### Finally running
 This will start the web server on port 5000
@@ -54,7 +54,7 @@ python run.py
 Then just head over to http://hostname:5000 and you should be able to login with your SoftLayer portal username and password.
 To run the server as a daemon just add the & symbol to the end of that command. There is currently no init script or anything fancy like that.
 
-I'll leave seting up nginx as an excersize for the reader.
+I'll leave setting up nginx as an exersize for the reader.
 
 
 System Requirements

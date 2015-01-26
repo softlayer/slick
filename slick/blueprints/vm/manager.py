@@ -342,15 +342,10 @@ def _extract_instance_data(instance):
     if not tagReferencesList:
         tag = 'None'
     else:
-        tagsReference = tagReferencesList[0]
-        tags = tagsReference.get('tag')
-        tag = tags.get('name')
-        x = 1
-        while (x < len(tagReferencesList)):
-            tagsReference = tagReferencesList[x]
-            tags = tagsReference.get('tag')
-            tag = tag + ', ' + tags.get('name')
-            x = x + 1
+        tags = []
+        for tagReference in tagReferencesList:
+           tags.append(tagReference['tag']['name'])
+        tag = ", ".join(tags)
         
     return_data = {
         'id': instance.get('id', None),

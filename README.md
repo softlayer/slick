@@ -8,30 +8,45 @@ Slick is a reference implementation for using the `SoftLayer Python Bindings <ht
 
 Installation
 ------------
-**Prerequirements**
-
+### Prerequirements
+Starting with a fresh install of Ubuntu 14.04-64
 ```bash
 apt-get install libpq-dev sqlite3 python-pip git python-dev
+pip install WTForms  wtforms-html5 WTForms-Components
+pip install flask
+pip install six --upgrade
 ```
 
-**Get everything running**
+### Get everything running
 
-If you don't want to have everything in /usr/local/slick make sure to change alembic.ini and config.py
 
+#### Getting the code
 ```bash
 cd /usr/local/
 git clone https://github.com/softlayer/slick.git
 cd slick
 python setup.py install
 ```
-If setup.py failed to install, make sure you install any missing packages and try again before continuing.
+If setup.py failed to install, make sure you install any missing packages and try again before continuing. Usually the setup will complain about a missing package, so just use pip to install or upgrade it, and you should be ok.
 
 
-This will setup the database
+#### Setup the database
 ```bash
 alembic upgrade head   
 ```
 
+
+#### Configuration
+Then you need to setup the config file. Just copy it to config.py, and edit the 2 secret strings. 
+
+If you don't want to have everything in /usr/local/slick make sure to change alembic.ini and config.py
+```bash
+cp config.py.sample config.py
+export SLICK_CONFIG_FILE=/usr/local/slick/config.py
+```
+You will need to either add SLICK_CONFIG_FILE to your bashrc, or export it every time you reboot.
+
+#### Finally running
 This will start the web server on port 5000
 ```bash
 python run.py
@@ -39,7 +54,7 @@ python run.py
 Then just head over to http://hostname:5000 and you should be able to login with your SoftLayer portal username and password.
 To run the server as a daemon just add the & symbol to the end of that command. There is currently no init script or anything fancy like that.
 
-I'll leave seting up nginx as an excersize for the reader.
+I'll leave setting up nginx as an exersize for the reader.
 
 
 System Requirements

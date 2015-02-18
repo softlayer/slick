@@ -1,6 +1,6 @@
 from flask.ext.wtf import Form
 from wtforms import RadioField, HiddenField, TextAreaField
-from wtforms.validators import Required
+from wtforms.validators import Required, Regexp
 from wtformsparsleyjs import StringField, SelectField
 
 

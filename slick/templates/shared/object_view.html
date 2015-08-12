@@ -19,6 +19,10 @@
             <dd>{{ object.public }}</dd>
             <dt>Private IP</dt>
             <dd>{{ object.private }}</dd>
+            {% if object.tags %}
+            <dt>Tags</dt>
+            <dd>{{ object.tags }}</dd>
+            {% endif %}
             {% if object.notes %}
             <dt>Notes</dt>
             <dd>{{ object.notes }}</dd>

@@ -1,6 +1,6 @@
 from flask.ext.wtf import Form
 from wtforms import RadioField, HiddenField, TextAreaField
-from wtforms.validators import Required
+from wtforms.validators import Required, Regexp
 from wtformsparsleyjs import StringField, SelectField
 
 
@@ -13,6 +13,9 @@ class CreateVMForm(Form):
     memory = SelectField('Memory (GB)', validators=[Required()])
     network = RadioField(choices=[('10', '10Mbps'), ('100', '100Mbps'),
                                   ('1000', '1000 Mbps')])
+    tags = StringField('Tags', validators=[Regexp(r'^[A-Za-z0-9_\.\-,\ ]*$',
+                               message="Tags must be alphanumeric, _ . or -")
+            ])
 
 
 class EditVMForm(Form):

@@ -130,7 +130,7 @@ def get_instance(instance_id, full_data=False):
     return instance
 
 
-def launch_instance(hostname, domain, os, cpus, memory, network, datacenter=''):
+def launch_instance(hostname, domain, os, cpus, memory, network, tags='', datacenter=''):
     """ This method wraps the CCIManager's create_instance() call.
 
     :param string datacenter: The datacenter in which to spin up the new VM.
@@ -140,6 +140,7 @@ def launch_instance(hostname, domain, os, cpus, memory, network, datacenter=''):
     :param int cpus: The number of CPUs needed for the new VM.
     :param int memory: The amount of memory (in MB) for the new VM.
     :param int network: The speed (in Mbps) for the new VM.
+    :param string tags: The tags associated with the new VM.
     """
     instance = {
         'datacenter': datacenter,
@@ -148,7 +149,8 @@ def launch_instance(hostname, domain, os, cpus, memory, network, datacenter=''):
         'os_code': os,
         'cpus': cpus,
         'memory': memory,
-        'nic_speed': network
+        'nic_speed': network,
+        'tags': tags
     }
 
     try:
@@ -336,6 +338,15 @@ def _extract_instance_data(instance):
         active = True
         status = 'Running'
 
+    tagReferencesList = instance.get('tagReferences', None)
+    if not tagReferencesList:
+        tag = 'None'
+    else:
+        tags = []
+        for tagReference in tagReferencesList:
+           tags.append(tagReference['tag']['name'])
+        tag = ", ".join(tags)
+        
     return_data = {
         'id': instance.get('id', None),
         'hostname': instance.get('hostname'),
@@ -350,6 +361,7 @@ def _extract_instance_data(instance):
         'status': status,
         'notes': instance.get('notes'),
         'userdata': instance.get('userdata'),
+        'tags': tag
     }
 
     os_block = lookup(instance, 'operatingSystem', 'softwareLicense',
